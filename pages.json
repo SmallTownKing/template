@@ -13,5 +13,30 @@
 		"navigationBarBackgroundColor": "#F8F8F8",
 		"backgroundColor": "#F8F8F8"
 	},
+	"easycom": {
+		"autoscan": true,
+		"custom": {
+			"^base-(.*)": "@/components/base-$1/base-$1.vue",
+			"^card-(.*)": "@/components/business/card/card-$1/card-$1.vue",
+			"^home-(.*)": "@/components/business/home/home-$1/home-$1.vue",
+			"^lottery-(.*)": "@/components/business/lottery/lottery-$1/lottery-$1.vue",
+			"^market-(.*)": "@/components/business/market/market-$1/market-$1.vue",
+			"^points-(.*)": "@/components/business/market/points-$1/points-$1.vue",
+			"^sale-(.*)": "@/components/business/market/sale-$1/sale-$1.vue",
+			"^daily-ranking-(.*)": "@/components/business/ranking/daily-ranking-$1/daily-ranking-$1.vue",
+			"^draw-record-(.*)": "@/components/business/record/draw-record-$1/draw-record-$1.vue",
+			"^notice-(.*)": "@/components/business/shared/notice-$1/notice-$1.vue",
+			"^rule-(.*)": "@/components/business/shared/rule-$1/rule-$1.vue",
+			"^confirm-(.*)": "@/components/business/shared/confirm-$1/confirm-$1.vue",
+			"^result-(.*)": "@/components/business/shared/result-$1/result-$1.vue",
+			"^address-(.*)": "@/components/business/user/address-$1/address-$1.vue",
+			"^customer-service-(.*)": "@/components/business/user/customer-service-$1/customer-service-$1.vue",
+			"^recharge-(.*)": "@/components/business/user/recharge-$1/recharge-$1.vue",
+			"^settings-(.*)": "@/components/business/user/settings-$1/settings-$1.vue",
+			"^user-(.*)": "@/components/business/user/user-$1/user-$1.vue",
+			"^withdraw-(.*)": "@/components/business/user/withdraw-$1/withdraw-$1.vue",
+			"^warehouse-(.*)": "@/components/business/warehouse/warehouse-$1/warehouse-$1.vue"
+		}
+	},
 	"uniIdRouter": {}
 }
