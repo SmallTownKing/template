@@ -6,21 +6,17 @@
             <view class="congrats__more" @click="handleMore">
                 Thêm nhiều <text class="arrow">❯</text>
             </view>
-
             <view class="congrats__swiper-area">
-
                 <block v-if="localList.length > 0">
-                    <swiper class="congrats__swiper" autoplay circular :interval="3000" :duration="500"
+                    <swiper class="congrats__swiper" autoplay circular :interval="3000" :duration="300"
                         next-margin="240rpx" @change="onSwiperChange">
                         <swiper-item v-for="(item, index) in localList" :key="index">
                             <view class="winner-card" :class="[
                                 index % 2 === 0 ? 'winner-card--red' : 'winner-card--yellow',
                                 { 'is-glaring': currentIndex === index }
                             ]" @click="handleCard(item, index)">
-
                                 <view class="winner-card__glare"></view>
                                 <view class="winner-card__watermark">SP SP SP<br>SP SP SP</view>
-
                                 <view class="winner-card__main">
                                     <view class="user-info">
                                         <image class="user-info__avatar" :src="item.avatar" mode="aspectFill" />
@@ -30,7 +26,6 @@
                                                 <image v-if="item.badge" class="user-info__badge" :src="item.badge"
                                                     mode="aspectFit" />
                                             </view>
-
                                             <view class="price-tag">
                                                 <view class="price-tag__skew">
                                                     <view class="price-tag__sp">
@@ -42,7 +37,6 @@
                                         </view>
                                     </view>
                                 </view>
-
                                 <view class="winner-card__aside">
                                     <image class="winner-card__prize" :src="item.prizeImg" mode="aspectFill" />
                                 </view>
@@ -50,12 +44,10 @@
                         </swiper-item>
                     </swiper>
                 </block>
-
                 <view class="skeleton-area" v-else>
                     <view class="skeleton-card"></view>
                     <view class="skeleton-card"></view>
                 </view>
-
             </view>
         </view>
     </view>
