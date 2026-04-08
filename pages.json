@@ -6,6 +6,34 @@
 				"navigationBarTitleText": "uni-app",
 				"navigationStyle": "custom"
 			}
+		},
+		{
+			"path": "pages/card-release/index",
+			"style": {
+				"navigationBarTitleText": "card-release",
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/market/index",
+			"style": {
+				"navigationBarTitleText": "market",
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/warehouse/index",
+			"style": {
+				"navigationBarTitleText": "warehouse",
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/user-center/index",
+			"style": {
+				"navigationBarTitleText": "user-center",
+				"navigationStyle": "custom"
+			}
 		}
 	],
 	"globalStyle": {
