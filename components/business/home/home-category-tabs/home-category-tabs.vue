@@ -1,28 +1,41 @@
 <template>
     <view class="custom-tabs" style="position: relative;">
 
-        <view class="fade-mask fade-mask--left" :class="{ 'is-show': showLeftMask }"></view>
+        <view class="fade-mask fade-mask--left" :class="{ 'is-show': showLeftMask && !loading }"></view>
 
         <scroll-view class="tabs-scroll" scroll-x :show-scrollbar="false" :scroll-with-animation="true"
             :scroll-into-view="'tab-' + modelValue" @scroll="onScroll">
             <view class="tabs-wrapper">
-                <view class="tab-item" v-for="(item, index) in list" :key="index" :id="'tab-' + index"
-                    :class="{ 'tab-item--active': modelValue === index }" @click="handleTabClick(index, item)">
-                    <view class="tab-item__content">
-                        <image v-if="item.icon" class="tab-item__icon"
-                            :src="modelValue === index ? (item.activeIcon || item.icon) : item.icon" mode="aspectFit"
-                            :style="{
-                                width: (item.iconWidth || 32) + 'rpx',
-                                height: (item.iconHeight || 32) + 'rpx',
-                                marginTop: (item.marginTop || 0) + 'rpx',
-                                marginRight: (item.marginRight !== undefined ? item.marginRight : 10) + 'rpx'
-                            }" />
-                        <view class="tab-item__text-wrap">
-                            <text class="tab-item__text">{{ item.name }}</text>
-                            <view class="tab-item__line"></view>
+                
+                <block v-if="loading">
+                    <view class="tab-item skeleton-item" v-for="i in 5" :key="i">
+                        <view class="skeleton-content">
+                            <view class="skeleton-icon"></view>
+                            <view class="skeleton-text"></view>
                         </view>
                     </view>
-                </view>
+                </block>
+
+                <block v-else>
+                    <view class="tab-item" v-for="(item, index) in list" :key="index" :id="'tab-' + index"
+                        :class="{ 'tab-item--active': modelValue === index }" @click="handleTabClick(index, item)">
+                        <view class="tab-item__content">
+                            <image v-if="item.icon" class="tab-item__icon"
+                                :src="modelValue === index ? (item.activeIcon || item.icon) : item.icon" mode="aspectFit"
+                                :style="{
+                                    width: (item.iconWidth || 32) + 'rpx',
+                                    height: (item.iconHeight || 32) + 'rpx',
+                                    marginTop: (item.marginTop || 0) + 'rpx',
+                                    marginRight: (item.marginRight !== undefined ? item.marginRight : 10) + 'rpx'
+                                }" />
+                            <view class="tab-item__text-wrap">
+                                <text class="tab-item__text">{{ item.name }}</text>
+                                <view class="tab-item__line"></view>
+                            </view>
+                        </view>
+                    </view>
+                </block>
+
             </view>
         </scroll-view>
     </view>
@@ -42,7 +55,8 @@ const list = ref([
 ])
 
 const props = defineProps({
-    modelValue: { type: Number, default: 0 }
+    modelValue: { type: Number, default: 0 },
+    loading: { type: Boolean, default: false } 
 })
 
 const emit = defineEmits(['update:modelValue', 'change'])
@@ -50,6 +64,7 @@ const emit = defineEmits(['update:modelValue', 'change'])
 const showLeftMask = ref(false)
 
 const onScroll = (e) => {
+    if (props.loading) return
     showLeftMask.value = e.detail.scrollLeft > 10
 }
 
@@ -84,7 +99,6 @@ const handleTabClick = (index, item) => {
 
     &.is-show {
         opacity: 1;
-        /* 触发显示 */
     }
 }
 
@@ -116,7 +130,6 @@ const handleTabClick = (index, item) => {
     justify-content: center;
     padding: 0 16rpx;
     height: 100%;
-
     flex-shrink: 0;
 
     &__content {
@@ -170,5 +183,38 @@ const handleTabClick = (index, item) => {
             opacity: 1;
         }
     }
+}
+
+.skeleton-item {
+    pointer-events: none; 
+}
+
+.skeleton-content {
+    display: flex;
+    align-items: center;
+    height: 100%;
+}
+
+.skeleton-icon {
+    width: 44rpx;
+    height: 44rpx;
+    border-radius: 50%; /* 图标位置用圆形占位 */
+    background-color: #e0e0e0;
+    margin-right: 10rpx;
+    animation: skeleton-pulse 1.5s ease-in-out infinite;
+}
+
+.skeleton-text {
+    width: 80rpx;
+    height: 32rpx;
+    border-radius: 6rpx; /* 文字位置用长条圆角占位 */
+    background-color: #e0e0e0;
+    animation: skeleton-pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes skeleton-pulse {
+    0% { opacity: 0.8; }
+    50% { opacity: 0.4; }
+    100% { opacity: 0.8; }
 }
 </style>

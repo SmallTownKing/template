@@ -26,6 +26,7 @@
 				<view class="price-row">
 					<text class="currency">{{ item.currency || 'RM' }}</text>
 					<text class="price-val">{{ item.price }}</text>
+					<text style="color: #787777; font-size: 20rpx ;">/包（1张）</text>
 				</view>
 			</view>
 		</block>
