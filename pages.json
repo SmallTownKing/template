@@ -1,9 +1,8 @@
 {
-	"pages": [ //pages数组中第一项表示应用启动页，参考：https://uniapp.dcloud.io/collocation/pages
+	"pages": [
 		{
 			"path": "pages/index/index",
 			"style": {
-				"navigationBarTitleText": "uni-app",
 				"navigationStyle": "custom"
 			}
 		},
@@ -41,6 +40,46 @@
 		"navigationBarTitleText": "uni-app",
 		"navigationBarBackgroundColor": "#F8F8F8",
 		"backgroundColor": "#F8F8F8"
+	},
+	"tabBar": {
+		"color": "#666666",
+		"selectedColor": "#000000",
+		"backgroundColor": "#fff",
+		"fontSize": "10px",
+		"iconWidth": "24px",
+		"height": "70px",
+		"list": [
+			{
+				"pagePath": "pages/index/index",
+				"iconPath": "static/tabbar/t2.png",
+				"selectedIconPath": "static/tabbar/t1.png",
+				"text": "Trò chơi"
+			},
+			{
+				"pagePath": "pages/card-release/index",
+				"iconPath": "static/tabbar/t4.png",
+				"selectedIconPath": "static/tabbar/t3.png",
+				"text": "Thẻ bài"
+			},
+			{
+				"pagePath": "pages/market/index",
+				"iconPath": "static/tabbar/t6.png",
+				"selectedIconPath": "static/tabbar/t5.png",
+				"text": "Chợ"
+			},
+			{
+				"pagePath": "pages/warehouse/index",
+				"iconPath": "static/tabbar/t8.png",
+				"selectedIconPath": "static/tabbar/t7.png",
+				"text": "Kho hàng"
+			},
+			{
+				"pagePath": "pages/user-center/index",
+				"iconPath": "static/tabbar/t10.png",
+				"selectedIconPath": "static/tabbar/t9.png",
+				"text": "Của tôi"
+			}
+		]
 	},
 	"easycom": {
 		"autoscan": true,
