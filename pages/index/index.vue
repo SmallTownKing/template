@@ -1,13 +1,20 @@
 <template>
-	<view >
-		<home-hero />
+	<view class="page">
+		<base-navbar
+			background="#0f172a"
+			left-width="260rpx"
+			right-width="220rpx"
+			:show-border="false"
+			:show-center="false"
+		>
+		</base-navbar>
 	</view>
 </template>
 
-<script >
-	
+<script setup>
+
 </script>
 
-<style>
+<style lang="scss">
 
 </style>
