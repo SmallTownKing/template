@@ -28,13 +28,11 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 
-// === 响应式数据 ===
 const currentTabIndex = ref(0)
 const bannerList = ref([])
 const headerList = ref([])
-const productList = ref([{}, {}, {}, {}])
+const productList = ref([{}, {}])
 
-// === 交互事件 ===
 const handleSectionClick = (payload) => {
 	console.log('点击了快捷导航:', payload)
 }
@@ -43,17 +41,12 @@ const handleProductClick = (item) => {
 	console.log('点击了商品, 准备跳转详情页, ID:', item.id)
 }
 
-// 监听 Tab 切换，触发对应分类的商品请求
 const handleTabChange = ({ index, item }) => {
 	console.log('切换 Tab:', index, item)
-	// 切换时先清空当前列表，让 product-card 触发骨架屏效果
 	productList.value = []
 	fetchProductList(index)
 }
 
-// === 模拟 API 网络请求 ===
-
-// 1. 获取首页基础数据 (轮播图、头条等)
 const fetchHomeBaseData = () => {
 	setTimeout(() => {
 		bannerList.value = [
@@ -67,14 +60,12 @@ const fetchHomeBaseData = () => {
 			{ price: '200.00', name: '李四' },
 			{ price: '300.00', name: '王五' }
 		]
-	}, 3000) // 模拟 300ms 延迟
+	}, 3000)
 }
 
-// 2. 获取商品列表数据 (支持根据分类 ID 获取)
 const fetchProductList = (categoryId = 0) => {
-	productList.value = [{}, {}, {}, {}] // 切换分类时先置空，触发骨架屏效果
+	productList.value = [{}, {},]
 	setTimeout(() => {
-		// 模拟后端返回的数据
 		productList.value = [
 			{
 				id: 1,
@@ -88,10 +79,9 @@ const fetchProductList = (categoryId = 0) => {
 			},
 
 		]
-	}, 2000) // 模拟 600ms 延迟，展示骨架屏过程
+	}, 2000)
 }
 
-// 页面挂载时初始化数据
 onMounted(() => {
 	fetchHomeBaseData()
 	fetchProductList(currentTabIndex.value)
@@ -102,6 +92,7 @@ onMounted(() => {
 .home-page {
 	background-color: #f6f6fa;
 	min-height: calc(100vh - var(--window-bottom));
+
 	&__logo {
 		width: 100%;
 		height: 54rpx;

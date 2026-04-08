@@ -10,14 +10,14 @@
             <view class="congrats__swiper-area">
 
                 <block v-if="localList.length > 0">
-                    <swiper class="congrats__swiper" autoplay circular :interval="300000" :duration="500"
+                    <swiper class="congrats__swiper" autoplay circular :interval="3000" :duration="500"
                         next-margin="240rpx" @change="onSwiperChange">
                         <swiper-item v-for="(item, index) in localList" :key="index">
                             <view class="winner-card" :class="[
                                 index % 2 === 0 ? 'winner-card--red' : 'winner-card--yellow',
-                                { 'is-glaring': currentIndex === index } 
+                                { 'is-glaring': currentIndex === index }
                             ]" @click="handleCard(item, index)">
-                                
+
                                 <view class="winner-card__glare"></view>
                                 <view class="winner-card__watermark">SP SP SP<br>SP SP SP</view>
 
@@ -27,9 +27,10 @@
                                         <view class="user-info__detail">
                                             <view class="user-info__name-row">
                                                 <text class="user-info__nickname">{{ item.name }}</text>
-                                                <image v-if="item.badge" class="user-info__badge" :src="item.badge" mode="aspectFit" />
+                                                <image v-if="item.badge" class="user-info__badge" :src="item.badge"
+                                                    mode="aspectFit" />
                                             </view>
-                                            
+
                                             <view class="price-tag">
                                                 <view class="price-tag__skew">
                                                     <view class="price-tag__sp">
@@ -101,7 +102,7 @@ const animatePrice = (index) => {
 
     const originalPriceStr = String(localList.value[index].price)
     const target = Number(originalPriceStr)
-    
+
     // 判断是否有小数，例如 "100.50" 有 2 位小数
     const hasDecimal = originalPriceStr.includes('.')
     const decimalPlaces = hasDecimal ? originalPriceStr.split('.')[1].length : 0
@@ -226,8 +227,13 @@ const handleCard = (item, index) => emit('click', { item, index })
     justify-content: space-between;
 
     /* 主题修饰符 */
-    &--red { background: linear-gradient(135deg, #d32f2f, #e53935); }
-    &--yellow { background: linear-gradient(135deg, #fbc02d, #ffca28); }
+    &--red {
+        background: linear-gradient(135deg, #d32f2f, #e53935);
+    }
+
+    &--yellow {
+        background: linear-gradient(135deg, #fbc02d, #ffca28);
+    }
 
     /* 卡片暗纹 */
     &__watermark {
@@ -250,7 +256,7 @@ const handleCard = (item, index) => emit('click', { item, index })
         left: -100%;
         width: 50%;
         height: 100%;
-        background: linear-gradient(to right, rgba(255,255,255,0) 0%, rgba(255,255,255,0.4) 50%, rgba(255,255,255,0) 100%);
+        background: linear-gradient(to right, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.4) 50%, rgba(255, 255, 255, 0) 100%);
         transform: skewX(-25deg);
         z-index: 10;
         pointer-events: none;
@@ -290,8 +296,13 @@ const handleCard = (item, index) => emit('click', { item, index })
 }
 
 @keyframes sweep-glare {
-    0% { left: -100%; }
-    100% { left: 200%; }
+    0% {
+        left: -100%;
+    }
+
+    100% {
+        left: 200%;
+    }
 }
 
 /* ================= 3. 用户信息模块 ================= */
@@ -396,8 +407,16 @@ const handleCard = (item, index) => emit('click', { item, index })
 }
 
 @keyframes skeleton-pulse {
-    0% { opacity: 0.8; }
-    50% { opacity: 0.4; }
-    100% { opacity: 0.8; }
+    0% {
+        opacity: 0.8;
+    }
+
+    50% {
+        opacity: 0.4;
+    }
+
+    100% {
+        opacity: 0.8;
+    }
 }
 </style>
