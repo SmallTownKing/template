@@ -13,9 +13,3 @@ export const getUserDrawLog = (params = {}, options = {}) => {
 export const getBoxData = (params = {}, options = {}) => {
     return request.get(`${USER_API_PREFIX}/box/getBoxData`, params, options)
 }
-
-
-export const getSaleBoxOpenLog = (params = {}, options = {}) => {
-    return request.get(`${USER_API_PREFIX}/box/getOneBoxDetail`, params, options)
-}
-

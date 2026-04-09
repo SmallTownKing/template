@@ -86,7 +86,6 @@ const handleLocaleSelect = (item) => {
 	if (item?.code) {
 		setLocale(item.code)
 	}
-
 	closeLanguageDropdown()
 }
 
@@ -94,7 +93,6 @@ const initData = () => {
 	loading.value = true
 	bannerList.value = []
 	productList.value = [{}, {}]
-
 	Promise.all([getBoxData()])
 		.then(([boxDataRes]) => {
 			loading.value = false

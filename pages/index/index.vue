@@ -41,7 +41,7 @@
 import { computed, onMounted, ref } from 'vue'
 import { useAppI18n } from '@/i18n'
 import { useAppStore, useAuthPopupStore } from '@/stores'
-import { getList, getUserDrawLog, getBoxData, getSaleBoxOpenLog } from '@/apis/home'
+import { getList, getUserDrawLog, getBoxData } from '@/apis/home'
 import { adaptScheduleBanner, adaptHeaderList, adaptProductList } from './adapter'
 
 const { locale, setLocale, supportedLocales, t } = useAppI18n()
@@ -95,7 +95,6 @@ const handleAuthTap = () => {
 }
 
 const handleProductClick = (item) => {
-	getSaleBoxOpenLog({ id: 4 }).catch(() => {})
 	console.log('clicked product, ready to navigate detail', item.id)
 }
 
@@ -110,7 +109,7 @@ const initData = () => {
 	headerList.value = []
 	productList.value = [{}, {}]
 
-	Promise.all([getList(), getBoxData(), getUserDrawLog()])
+	Promise.all([getList(), getBoxData({category_id: 11}), getUserDrawLog()])
 		.then(([listRes, boxDataRes, userDrawLogRes]) => {
 			loading.value = false
 			bannerList.value = adaptScheduleBanner(listRes)
