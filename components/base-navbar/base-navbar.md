@@ -69,7 +69,7 @@
 | `rightWidth` | 右侧区域宽度覆盖值 | `Number/String` | `''` |
 | `contentMaxWidth` | 内容最大宽度，适合 H5 大屏居中 | `Number/String` | `''` |
 | `bottomHeight` | 底部扩展区最小高度 | `Number/String` | `0` |
-| `zIndex` | 层级 | `Number` | `998` |
+| `zIndex` | 层级 | `Number` | `10` |
 | `background` | 背景色或渐变背景 | `String` | `#ffffff` |
 | `backgroundImage` | 背景图 URL | `String` | `''` |
 | `backgroundOpacity` | 背景层透明度 | `Number` | `1` |

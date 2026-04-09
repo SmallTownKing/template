@@ -1,9 +1,13 @@
 <script>
+	import { getLocale, syncTabBarLocale } from './i18n'
+
 	export default {
 		onLaunch: function() {
+			syncTabBarLocale(getLocale())
 			console.log('App Launch')
 		},
 		onShow: function() {
+			syncTabBarLocale(getLocale())
 			console.log('App Show')
 		},
 		onHide: function() {
@@ -13,5 +17,5 @@
 </script>
 
 <style>
-	/*每个页面公共css */
+	/* 每个页面公共 css */
 </style>

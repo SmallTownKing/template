@@ -53,37 +53,38 @@
 				"pagePath": "pages/index/index",
 				"iconPath": "static/tabbar/t2.png",
 				"selectedIconPath": "static/tabbar/t1.png",
-				"text": "Trò chơi"
+				"text": "\u6e38\u620f"
 			},
 			{
 				"pagePath": "pages/card-release/index",
 				"iconPath": "static/tabbar/t4.png",
 				"selectedIconPath": "static/tabbar/t3.png",
-				"text": "Thẻ bài"
+				"text": "\u5361\u724c"
 			},
 			{
 				"pagePath": "pages/market/index",
 				"iconPath": "static/tabbar/t6.png",
 				"selectedIconPath": "static/tabbar/t5.png",
-				"text": "Chợ"
+				"text": "\u96c6\u5e02"
 			},
 			{
 				"pagePath": "pages/warehouse/index",
 				"iconPath": "static/tabbar/t8.png",
 				"selectedIconPath": "static/tabbar/t7.png",
-				"text": "Kho hàng"
+				"text": "\u4ed3\u5e93"
 			},
 			{
 				"pagePath": "pages/user-center/index",
 				"iconPath": "static/tabbar/t10.png",
 				"selectedIconPath": "static/tabbar/t9.png",
-				"text": "Của tôi"
+				"text": "\u6211\u7684"
 			}
 		]
 	},
 	"easycom": {
 		"autoscan": true,
 		"custom": {
+			"^uni-(.*)": "@dcloudio/uni-ui/lib/uni-$1/uni-$1.vue",
 			"^base-(.*)": "@/components/base-$1/base-$1.vue",
 			"^card-(.*)": "@/components/business/card/card-$1/card-$1.vue",
 			"^home-(.*)": "@/components/business/home/home-$1/home-$1.vue",

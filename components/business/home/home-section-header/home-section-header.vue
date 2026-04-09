@@ -4,17 +4,29 @@
 			<image class="congrats__bg-img" src="/static/images/congrats-bg.png" mode="scaleToFill" />
 
 			<view class="congrats__more" @click="handleMore">
-				Thêm nhiều <text class="arrow">❯</text>
+				{{ t('home_005') }} <text class="arrow">›</text>
 			</view>
+
 			<view class="congrats__swiper-area">
 				<block v-if="localList.length > 0">
-					<swiper class="congrats__swiper" autoplay circular :interval="3000" :duration="300"
-						next-margin="240rpx" @change="onSwiperChange">
+					<swiper
+						class="congrats__swiper"
+						autoplay
+						circular
+						:interval="3000"
+						:duration="300"
+						next-margin="240rpx"
+						@change="onSwiperChange"
+					>
 						<swiper-item v-for="(item, index) in localList" :key="index">
-							<view class="winner-card" :class="[
-								index % 2 === 0 ? 'winner-card--red' : 'winner-card--yellow',
-								{ 'is-glaring': currentIndex === index }
-							]" @click="handleCard(item, index)">
+							<view
+								class="winner-card"
+								:class="[
+									index % 2 === 0 ? 'winner-card--red' : 'winner-card--yellow',
+									{ 'is-glaring': currentIndex === index }
+								]"
+								@click="handleCard(item, index)"
+							>
 								<view class="winner-card__glare"></view>
 								<view class="winner-card__main">
 									<view class="user-info">
@@ -44,7 +56,8 @@
 						</swiper-item>
 					</swiper>
 				</block>
-				<view class="congrats__skeleton" v-else>
+
+				<view v-else class="congrats__skeleton">
 					<view class="congrats__skeleton-card"></view>
 					<view class="congrats__skeleton-card"></view>
 				</view>
@@ -54,28 +67,29 @@
 </template>
 
 <script setup>
-	import {
-		ref,
-		watch,
-		onUnmounted
-	} from 'vue'
+import { onUnmounted, ref, watch } from 'vue'
+import { useAppI18n } from '@/i18n'
 
-	const props = defineProps({
-		list: {
-			type: Array,
-			default: () => []
-		}
-	})
+const { t } = useAppI18n()
 
-	const emit = defineEmits(['more', 'click'])
+const props = defineProps({
+	list: {
+		type: Array,
+		default: () => []
+	}
+})
 
-	const currentIndex = ref(0)
-	const localList = ref([])
-	const timers = {}
+const emit = defineEmits(['more', 'click'])
 
-	watch(() => props.list, (newList) => {
+const currentIndex = ref(0)
+const localList = ref([])
+const timers = {}
+
+watch(
+	() => props.list,
+	(newList) => {
 		if (newList && newList.length > 0) {
-			localList.value = newList.map(item => {
+			localList.value = newList.map((item) => {
 				const originalPriceStr = String(item.price || 0)
 				const hasDecimal = originalPriceStr.includes('.')
 				const decimalPlaces = hasDecimal ? originalPriceStr.split('.')[1].length : 0
@@ -95,322 +109,324 @@
 		} else {
 			localList.value = []
 		}
-	}, {
+	},
+	{
 		immediate: true,
 		deep: true
+	}
+)
+
+const onSwiperChange = (e) => {
+	currentIndex.value = e.detail.current
+	animatePrice(currentIndex.value)
+}
+
+const animatePrice = (index) => {
+	if (!localList.value[index]) return
+
+	const targetItem = localList.value[index]
+	const target = Number(targetItem.price)
+	const decimalPlaces = targetItem.decimalPlaces
+
+	localList.value.forEach((item, currentItemIndex) => {
+		if (currentItemIndex !== index) {
+			if (timers[currentItemIndex]) clearInterval(timers[currentItemIndex])
+			item.displayPrice = item.originalFormattedPrice
+		}
 	})
 
-	const onSwiperChange = (e) => {
-		currentIndex.value = e.detail.current
-		animatePrice(currentIndex.value)
+	if (Number.isNaN(target)) {
+		targetItem.displayPrice = targetItem.originalFormattedPrice
+		return
 	}
 
-	const animatePrice = (index) => {
-		if (!localList.value[index]) return
+	if (timers[index]) {
+		clearInterval(timers[index])
+	}
 
-		const targetItem = localList.value[index]
-		const target = Number(targetItem.price)
-		const decimalPlaces = targetItem.decimalPlaces
+	targetItem.displayPrice = (0).toFixed(decimalPlaces)
+	const duration = 600
+	const frames = 30
+	const stepTime = Math.floor(duration / frames)
+	let currentFrame = 0
 
-		localList.value.forEach((item, i) => {
-			if (i !== index) {
-				if (timers[i]) clearInterval(timers[i])
-				item.displayPrice = item.originalFormattedPrice
-			}
-		})
+	timers[index] = setInterval(() => {
+		currentFrame++
+		const progress = currentFrame / frames
+		const easeProgress = 1 - Math.pow(1 - progress, 3)
 
-		if (isNaN(target)) {
-			targetItem.displayPrice = targetItem.originalFormattedPrice
-			return
-		}
+		const currentValue = easeProgress * target
+		targetItem.displayPrice = currentValue.toFixed(decimalPlaces)
 
-		if (timers[index]) {
+		if (currentFrame >= frames) {
 			clearInterval(timers[index])
+			targetItem.displayPrice = targetItem.originalFormattedPrice
 		}
+	}, stepTime)
+}
 
-		targetItem.displayPrice = (0).toFixed(decimalPlaces)
-		const duration = 600
-		const frames = 30
-		const stepTime = Math.floor(duration / frames)
-		let currentFrame = 0
+onUnmounted(() => {
+	Object.values(timers).forEach((timer) => clearInterval(timer))
+})
 
-		timers[index] = setInterval(() => {
-			currentFrame++
-			const progress = currentFrame / frames
-			const easeProgress = 1 - Math.pow(1 - progress, 3)
+const handleMore = () => emit('more')
 
-			const currentVal = easeProgress * target
-			targetItem.displayPrice = currentVal.toFixed(decimalPlaces)
-
-			if (currentFrame >= frames) {
-				clearInterval(timers[index])
-				targetItem.displayPrice = targetItem.originalFormattedPrice
-			}
-		}, stepTime)
-	}
-
-	onUnmounted(() => {
-		Object.values(timers).forEach(timer => clearInterval(timer))
-	})
-
-	const handleMore = () => emit('more')
-	const handleCard = (item, index) => emit('click', {
-		item,
-		index
-	})
+const handleCard = (item, index) => emit('click', { item, index })
 </script>
 
 <style lang="scss" scoped>
-	.congrats {
+.congrats {
+	width: 100%;
+	padding: 0 32rpx;
+	box-sizing: border-box;
+
+	&__bg-container {
+		position: relative;
 		width: 100%;
-		padding: 0 32rpx;
-		box-sizing: border-box;
+		height: 168rpx;
+	}
 
-		&__bg-container {
-			position: relative;
-			width: 100%;
-			height: 168rpx;
-		}
+	&__bg-img {
+		position: absolute;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 100%;
+		z-index: 1;
+	}
 
-		&__bg-img {
-			position: absolute;
-			top: 0;
-			left: 0;
-			width: 100%;
-			height: 100%;
-			z-index: 1;
-		}
+	&__more {
+		position: absolute;
+		right: 0;
+		top: 2rpx;
+		font-size: 20rpx;
+		color: #333;
+		z-index: 10;
+		display: flex;
+		align-items: center;
 
-		&__more {
-			position: absolute;
-			right: 0;
-			top: 2rpx;
-			font-size: 20rpx;
-			color: #333;
-			z-index: 10;
-			display: flex;
-			align-items: center;
-
-			.arrow {
-				color: #999;
-				font-size: 18rpx;
-				margin-left: 4rpx;
-				font-weight: bold;
-			}
-		}
-
-		&__swiper-area {
-			position: absolute;
-			top: 52rpx;
-			left: 0;
-			width: 100%;
-			height: 104rpx;
-			z-index: 5;
-			overflow: hidden;
-		}
-
-		&__swiper {
-			width: 100%;
-			height: 100%;
-			box-sizing: border-box;
-		}
-
-		&__skeleton {
-			display: flex;
-			width: 100%;
-			height: 100%;
-			padding: 0 16rpx;
-			box-sizing: border-box;
-		}
-
-		&__skeleton-card {
-			flex-shrink: 0;
-			width: 440rpx;
-			height: 100%;
-			border-radius: 8rpx;
-			background-color: #e0e0e0;
-			margin-right: 16rpx;
-			animation: skeleton-pulse 1.5s ease-in-out infinite;
+		.arrow {
+			color: #999;
+			font-size: 18rpx;
+			margin-left: 4rpx;
+			font-weight: bold;
 		}
 	}
 
-	.winner-card {
+	&__swiper-area {
+		position: absolute;
+		top: 52rpx;
+		left: 0;
+		width: 100%;
+		height: 104rpx;
+		z-index: 5;
+		overflow: hidden;
+	}
+
+	&__swiper {
+		width: 100%;
+		height: 100%;
+		box-sizing: border-box;
+	}
+
+	&__skeleton {
 		display: flex;
-		width: calc(100% - 18rpx);
-		margin-left: 17rpx;
+		width: 100%;
+		height: 100%;
+		padding: 0 16rpx;
+		box-sizing: border-box;
+	}
+
+	&__skeleton-card {
+		flex-shrink: 0;
+		width: 440rpx;
 		height: 100%;
 		border-radius: 8rpx;
-		padding: 10rpx 14rpx;
-		box-sizing: border-box;
+		background-color: #e0e0e0;
+		margin-right: 16rpx;
+		animation: skeleton-pulse 1.5s ease-in-out infinite;
+	}
+}
+
+.winner-card {
+	display: flex;
+	width: calc(100% - 18rpx);
+	margin-left: 17rpx;
+	height: 100%;
+	border-radius: 8rpx;
+	padding: 10rpx 14rpx;
+	box-sizing: border-box;
+	position: relative;
+	overflow: hidden;
+	align-items: center;
+	justify-content: space-between;
+
+	&--red {
+		background: linear-gradient(135deg, #d32f2f, #e53935);
+	}
+
+	&--yellow {
+		background: linear-gradient(135deg, #fbc02d, #ffca28);
+	}
+
+	&.is-glaring {
+		.winner-card__glare {
+			animation: sweep-glare 0.8s ease-in-out forwards;
+		}
+	}
+
+	&__glare {
+		position: absolute;
+		top: 0;
+		left: -100%;
+		width: 50%;
+		height: 100%;
+		background: linear-gradient(
+			to right,
+			rgba(255, 215, 0, 0) 0%,
+			rgba(255, 245, 120, 0.85) 50%,
+			rgba(255, 215, 0, 0) 100%
+		);
+		transform: skewX(-25deg);
+		z-index: 10;
+		pointer-events: none;
+	}
+
+	&__main {
+		flex: 1;
 		position: relative;
+		z-index: 2;
+		min-width: 0;
+	}
+
+	&__aside {
+		width: 72rpx;
+		height: 72rpx;
+		border-radius: 6rpx;
+		border: 3rpx solid #ffffff;
+		background-color: #f5f5f5;
+		flex-shrink: 0;
+		margin-left: 10rpx;
 		overflow: hidden;
-		align-items: center;
-		justify-content: space-between;
-
-		&--red {
-			background: linear-gradient(135deg, #d32f2f, #e53935);
-		}
-
-		&--yellow {
-			background: linear-gradient(135deg, #fbc02d, #ffca28);
-		}
-
-		&.is-glaring {
-			.winner-card__glare {
-				animation: sweep-glare 0.8s ease-in-out forwards;
-			}
-		}
-
-		&__glare {
-			position: absolute;
-			top: 0;
-			left: -100%;
-			width: 50%;
-			height: 100%;
-			background: linear-gradient(to right,
-					rgba(255, 215, 0, 0) 0%,
-					rgba(255, 245, 120, 0.85) 50%,
-					rgba(255, 215, 0, 0) 100%);
-			transform: skewX(-25deg);
-			z-index: 10;
-			pointer-events: none;
-		}
-
-		&__main {
-			flex: 1;
-			position: relative;
-			z-index: 2;
-			min-width: 0;
-		}
-
-		&__aside {
-			width: 72rpx;
-			height: 72rpx;
-			border-radius: 6rpx;
-			border: 3rpx solid #ffffff;
-			background-color: #f5f5f5;
-			flex-shrink: 0;
-			margin-left: 10rpx;
-			overflow: hidden;
-			position: relative;
-			z-index: 2;
-		}
-
-		&__prize {
-			width: 100%;
-			height: 100%;
-			display: block;
-		}
+		position: relative;
+		z-index: 2;
 	}
 
-	.user-info {
+	&__prize {
+		width: 100%;
+		height: 100%;
+		display: block;
+	}
+}
+
+.user-info {
+	display: flex;
+	align-items: center;
+
+	&__avatar {
+		width: 70rpx;
+		height: 70rpx;
+		border-radius: 50%;
+		margin-right: 10rpx;
+		flex-shrink: 0;
+		background-color: #f5f5f5;
+	}
+
+	&__detail {
+		display: flex;
+		flex-direction: column;
+	}
+
+	&__name-row {
 		display: flex;
 		align-items: center;
-
-		&__avatar {
-			width: 70rpx;
-			height: 70rpx;
-			border-radius: 50%;
-			margin-right: 10rpx;
-			flex-shrink: 0;
-			background-color: #f5f5f5;
-		}
-
-		&__detail {
-			display: flex;
-			flex-direction: column;
-		}
-
-		&__name-row {
-			display: flex;
-			align-items: center;
-			margin-bottom: 6rpx;
-			height: 30rpx;
-		}
-
-		&__nickname {
-			font-size: 20rpx;
-			color: #ffffff;
-			font-weight: bold;
-			max-width: 100rpx;
-			overflow: hidden;
-			text-overflow: ellipsis;
-			white-space: nowrap;
-		}
-
-		&__vip {
-			height: 30rpx;
-			display: flex;
-			align-items: center;
-		}
-
-		&__badge {
-			width: 26rpx;
-			height: 26rpx;
-			margin-left: 4rpx;
-			flex-shrink: 0;
-		}
+		margin-bottom: 6rpx;
+		height: 30rpx;
 	}
 
-	.price-tag {
+	&__nickname {
+		font-size: 20rpx;
+		color: #ffffff;
+		font-weight: bold;
+		max-width: 100rpx;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
+
+	&__vip {
+		height: 30rpx;
 		display: flex;
-
-		&__skew {
-			background-color: #ffffff;
-			border-radius: 4rpx;
-			display: flex;
-			align-items: center;
-			padding-right: 8rpx;
-			transform: skewX(-15deg);
-		}
-
-		&__sp {
-			background-color: #e53935;
-			border-radius: 4rpx;
-			padding: 0 6rpx;
-			display: flex;
-			justify-content: center;
-			align-items: center;
-		}
-
-		&__sp-text {
-			transform: skewX(15deg);
-			color: #ffffff;
-			font-size: 16rpx;
-			font-weight: 900;
-			font-style: italic;
-		}
-
-		&__amount {
-			transform: skewX(15deg);
-			color: #000000;
-			font-size: 18rpx;
-			font-weight: 900;
-			margin-left: 6rpx;
-		}
+		align-items: center;
 	}
 
-	@keyframes sweep-glare {
-		0% {
-			left: -100%;
-		}
+	&__badge {
+		width: 26rpx;
+		height: 26rpx;
+		margin-left: 4rpx;
+		flex-shrink: 0;
+	}
+}
 
-		100% {
-			left: 200%;
-		}
+.price-tag {
+	display: flex;
+
+	&__skew {
+		background-color: #ffffff;
+		border-radius: 4rpx;
+		display: flex;
+		align-items: center;
+		padding-right: 8rpx;
+		transform: skewX(-15deg);
 	}
 
-	@keyframes skeleton-pulse {
-		0% {
-			opacity: 0.8;
-		}
-
-		50% {
-			opacity: 0.4;
-		}
-
-		100% {
-			opacity: 0.8;
-		}
+	&__sp {
+		background-color: #e53935;
+		border-radius: 4rpx;
+		padding: 0 6rpx;
+		display: flex;
+		justify-content: center;
+		align-items: center;
 	}
+
+	&__sp-text {
+		transform: skewX(15deg);
+		color: #ffffff;
+		font-size: 16rpx;
+		font-weight: 900;
+		font-style: italic;
+	}
+
+	&__amount {
+		transform: skewX(15deg);
+		color: #000000;
+		font-size: 18rpx;
+		font-weight: 900;
+		margin-left: 6rpx;
+	}
+}
+
+@keyframes sweep-glare {
+	0% {
+		left: -100%;
+	}
+
+	100% {
+		left: 200%;
+	}
+}
+
+@keyframes skeleton-pulse {
+	0% {
+		opacity: 0.8;
+	}
+
+	50% {
+		opacity: 0.4;
+	}
+
+	100% {
+		opacity: 0.8;
+	}
+}
 </style>

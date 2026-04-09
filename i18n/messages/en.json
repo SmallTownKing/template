@@ -1,12 +1,18 @@
 {
-    "home_001": "免费夺宝",
-    "home_002": "每日榜单",
-    "home_003": "福利大厅",
-    "home_004": "邀请好友",
-    "home_005": "更多",
-    "home_006": "保底赏",
-    "home_007": "高爆赏",
-    "home_008": "魔王赏",
-    "home_009": "一番赏",
-    "home_010": "对对碰"
+	"home_001": "Free Draw",
+	"home_002": "Daily Leaderboard",
+	"home_003": "Rewards Center",
+	"home_004": "Invite Friends",
+	"home_005": "More",
+	"home_006": "Guaranteed Prize",
+	"home_007": "Epic Drop",
+	"home_008": "Boss Prize",
+	"home_009": "Ichiban Prize",
+	"home_010": "Match & Win",
+	"home_011": "Login/Register",
+	"tabbar_001": "Play",
+	"tabbar_002": "Cards",
+	"tabbar_003": "Market",
+	"tabbar_004": "Warehouse",
+	"tabbar_005": "Mine"
 }

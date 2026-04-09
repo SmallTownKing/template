@@ -1,3 +1,4 @@
+import { ref } from 'vue'
 import en from './messages/en.json'
 import vi from './messages/vi.json'
 import zhHans from './messages/zh-Hans.json'
@@ -5,7 +6,8 @@ import {
 	DEFAULT_LOCALE,
 	I18N_STORAGE_KEY,
 	LOCALE_ALIASES,
-	SUPPORTED_LOCALES
+	SUPPORTED_LOCALES,
+	TABBAR_I18N_ITEMS
 } from './config'
 
 const messages = {
@@ -14,9 +16,9 @@ const messages = {
 	'zh-Hans': zhHans
 }
 
-const localeState = {
-	current: DEFAULT_LOCALE
-}
+const localeState = ref(DEFAULT_LOCALE)
+let tabBarSyncTimer = null
+let tabBarRetryTimer = null
 
 const supportedLocaleMap = SUPPORTED_LOCALES.reduce((result, item) => {
 	result[item.code] = true
@@ -81,32 +83,19 @@ const getStoredLocale = () => {
 }
 
 export const initLocale = () => {
-	localeState.current = resolveLocale(getStoredLocale() || getSystemLocale())
-	return localeState.current
+	localeState.value = resolveLocale(getStoredLocale() || getSystemLocale())
+	return localeState.value
 }
 
 export const getLocale = () => {
-	return localeState.current
-}
-
-export const setLocale = (locale) => {
-	const nextLocale = resolveLocale(locale)
-	localeState.current = nextLocale
-
-	try {
-		if (typeof uni !== 'undefined' && typeof uni.setStorageSync === 'function') {
-			uni.setStorageSync(I18N_STORAGE_KEY, nextLocale)
-		}
-	} catch (error) {}
-
-	return nextLocale
+	return localeState.value
 }
 
 export const getMessages = () => {
 	return messages
 }
 
-export const t = (key, params = {}, locale = localeState.current) => {
+export const t = (key, params = {}, locale = localeState.value) => {
 	const resolvedLocale = resolveLocale(locale)
 	const message =
 		getByPath(messages[resolvedLocale], key) ??
@@ -116,26 +105,134 @@ export const t = (key, params = {}, locale = localeState.current) => {
 	return interpolate(message, params)
 }
 
+const getCurrentRoute = () => {
+	try {
+		if (typeof getCurrentPages !== 'function') {
+			return ''
+		}
+
+		const pages = getCurrentPages() || []
+		const currentPage = pages[pages.length - 1]
+
+		return currentPage && currentPage.route ? currentPage.route : ''
+	} catch (error) {
+		return ''
+	}
+}
+
+const isTabBarPageRoute = (route) => {
+	if (!route) {
+		return false
+	}
+
+	return TABBAR_I18N_ITEMS.some((item) => item.pagePath === route)
+}
+
+const clearTabBarRetryTimer = () => {
+	if (!tabBarRetryTimer) {
+		return
+	}
+
+	clearTimeout(tabBarRetryTimer)
+	tabBarRetryTimer = null
+}
+
+export const syncTabBarLocale = (locale = localeState.value, options = {}) => {
+	if (typeof uni === 'undefined' || typeof uni.setTabBarItem !== 'function') {
+		return
+	}
+
+	const { retry = 0, retryDelay = 120 } = options
+	const currentRoute = getCurrentRoute()
+
+	if (!isTabBarPageRoute(currentRoute)) {
+		if (retry > 0) {
+			clearTabBarRetryTimer()
+			tabBarRetryTimer = setTimeout(() => {
+				syncTabBarLocale(locale, {
+					retry: retry - 1,
+					retryDelay
+				})
+			}, retryDelay)
+		}
+		return
+	}
+
+	clearTabBarRetryTimer()
+	const resolvedLocale = resolveLocale(locale)
+
+	TABBAR_I18N_ITEMS.forEach((item) => {
+		const label = t(item.key, {}, resolvedLocale)
+		const text = label === item.key ? item.fallback : label
+
+		try {
+			const result = uni.setTabBarItem({
+				index: item.index,
+				text,
+				fail: () => {}
+			})
+
+			if (result && typeof result.catch === 'function') {
+				result.catch(() => {})
+			}
+		} catch (error) {}
+	})
+}
+
+const queueSyncTabBarLocale = (locale = localeState.value, delay = 16) => {
+	if (tabBarSyncTimer) {
+		clearTimeout(tabBarSyncTimer)
+		tabBarSyncTimer = null
+	}
+
+	tabBarSyncTimer = setTimeout(() => {
+		syncTabBarLocale(locale, {
+			retry: 6,
+			retryDelay: 120
+		})
+		tabBarSyncTimer = null
+	}, delay)
+}
+
+export const setLocale = (locale) => {
+	const nextLocale = resolveLocale(locale)
+	localeState.value = nextLocale
+
+	try {
+		if (typeof uni !== 'undefined' && typeof uni.setStorageSync === 'function') {
+			uni.setStorageSync(I18N_STORAGE_KEY, nextLocale)
+		}
+	} catch (error) {}
+
+	queueSyncTabBarLocale(nextLocale)
+
+	return nextLocale
+}
+
 export const useAppI18n = () => {
 	return {
+		locale: localeState,
 		t,
 		getLocale,
 		setLocale,
 		resolveLocale,
 		messages,
-		supportedLocales: SUPPORTED_LOCALES
+		supportedLocales: SUPPORTED_LOCALES,
+		syncTabBarLocale
 	}
 }
 
 export const i18nPlugin = {
 	install(target) {
 		initLocale()
+		queueSyncTabBarLocale(localeState.value)
 
 		const api = {
 			$t: t,
 			$getLocale: getLocale,
 			$setLocale: setLocale,
-			$supportedLocales: SUPPORTED_LOCALES
+			$supportedLocales: SUPPORTED_LOCALES,
+			$syncTabBarLocale: syncTabBarLocale
 		}
 
 		if (target && target.config && target.config.globalProperties) {

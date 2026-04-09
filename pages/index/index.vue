@@ -1,24 +1,35 @@
 <template>
 	<view class="home-page">
-		<base-navbar left-width="294rpx" right-width="376rpx" shadow>
+		<base-navbar left-width="294rpx" right-width="376rpx" shadow @ready="handleNavbarReady">
 			<template #left>
 				<image class="home-page__logo" src="/static/images/home-head.png" mode="aspectFit" />
 			</template>
 			<template #right>
-				<input class="home-page__search" placeholder="Tìm kiếm..." />
+				<view class="home-page__actions">
+					<view class="home-page__language-trigger" @tap.stop="toggleLanguageDropdown">
+						<image class="home-page__language-icon" :src="currentLocaleIcon" mode="aspectFit" />
+					</view>
+					<view v-if="!isLogin" class="home-page__auth-button" @tap="handleAuthTap">
+						<text class="home-page__auth-text">{{ t('home_011') }}</text>
+					</view>
+				</view>
 			</template>
 		</base-navbar>
-
+		<home-language-dropdown
+			:show="isLanguageDropdownVisible"
+			:top="navbarHeight"
+			:locales="supportedLocales"
+			:current-locale="locale"
+			@close="closeLanguageDropdown"
+			@select="handleLocaleSelect"
+		/>
+		<base-login ref="loginPopupRef" />
 		<home-hero-banner :list="bannerList" />
-
-		<home-shortcut-grid @click="handleSectionClick" />
-
+		<home-shortcut-grid :loading="loading" @click="handleSectionClick" />
 		<home-section-header :list="headerList" />
-
-		<home-category-tabs :loading="loading" v-model="currentTabIndex" @change="handleTabChange" />
-
+		<home-category-tabs v-model="currentTabIndex" :loading="loading" @change="handleTabChange" />
 		<view class="product-grid">
-			<view class="product-grid__item" v-for="(item, index) in productList" :key="item.id || index">
+			<view v-for="(item, index) in productList" :key="item.id || index" class="product-grid__item">
 				<home-product-card :item="item" @click="handleProductClick" />
 			</view>
 		</view>
@@ -26,144 +37,173 @@
 </template>
 
 <script setup>
-	import {
-		ref,
-		onMounted
-	} from 'vue'
+import { computed, onMounted, ref } from 'vue'
+import { useAppI18n } from '@/i18n'
+import { useAppStore } from '@/stores'
+import { getList, getUserDrawLog, getBoxData } from '@/apis/home'
+import { adaptScheduleBanner, adaptHeaderList, adaptProductList } from './adapter'
 
-	const currentTabIndex = ref(0)
-	const bannerList = ref([])
-	const headerList = ref([])
-	const productList = ref([{}, {}])
-	const loading = ref(true)
+const { locale, setLocale, supportedLocales, t } = useAppI18n()
+const appStore = useAppStore()
+const currentTabIndex = ref(0)
+const bannerList = ref([])
+const headerList = ref([])
+const productList = ref([{}, {}])
+const loading = ref(true)
+const navbarHeight = ref(88)
+const isLanguageDropdownVisible = ref(false)
+const loginPopupRef = ref(null)
+const localeIconMap = {
+	'zh-Hans': '/static/lanuage/zh.webp',
+	en: '/static/lanuage/en.webp',
+	vi: '/static/lanuage/ms.webp'
+}
+const currentLocaleIcon = computed(() => {
+	return localeIconMap[locale.value] || localeIconMap['zh-Hans']
+})
 
-	const handleSectionClick = (payload) => {
-		console.log('点击了快捷导航:', payload)
+const isLogin = computed(() => appStore.isLogin)
+
+const handleNavbarReady = (payload) => {
+	navbarHeight.value = payload.totalHeight || 88
+}
+const toggleLanguageDropdown = () => {
+	isLanguageDropdownVisible.value = !isLanguageDropdownVisible.value
+}
+const closeLanguageDropdown = () => {
+	isLanguageDropdownVisible.value = false
+}
+const handleLocaleSelect = (item) => {
+	if (item && item.code) {
+		setLocale(item.code)
 	}
+	closeLanguageDropdown()
+}
+const handleSectionClick = (payload) => {
+	console.log('clicked shortcut section', payload)
+}
 
-	const handleProductClick = (item) => {
-		console.log('点击了商品, 准备跳转详情页, ID:', item.id)
-	}
+const handleAuthTap = () => {
+	loginPopupRef.value?.open()
+}
 
-	const handleTabChange = ({
-		index,
-		item
-	}) => {
-		productList.value = []
-		fetchProductList(index)
-	}
-	const fetchHomeBaseData = () => {
-		setTimeout(() => {
-			bannerList.value = [{
-					id: 1,
-					image: 'https://img.showgo.gg/brand/images/20260110/083c710596a74eed9945b0bf1b1b336f.webp'
-				},
-				{
-					id: 2,
-					image: 'https://img.showgo.gg/brand/images/20251031/b014b489cc4a5c5cfc360309022dc23a.webp'
-				},
-				{
-					id: 3,
-					image: 'https://img.showgo.gg/brand/images/20250818/43647e99a86d57f97c9967419ba7fb4f.webp'
-				},
-				{
-					id: 4,
-					image: 'https://img.showgo.gg/brand/images/20250812/9c56703fd4efe30f7634c597ff5eccf4.png'
-				},
-			]
+const handleProductClick = (item) => {
+	console.log('clicked product, ready to navigate detail', item.id)
+}
 
-			headerList.value = [{
-					avatar: 'https://img.showgo.gg/storage/upload/user/d0d6aa60b1dc5d103835425ccef944bc_69c6787f88a59.jpg',
-					price: '100.00',
-					name: '张三',
-					level: 1,
-					prizeImg: 'https://img.showgo.gg/cards/4_66759.webp?x-oss-process=image/resize,p_30'
-				},
-				{
-					avatar: 'https://img.showgo.gg/avatar1/default_21.webp',
-					price: '200.00',
-					name: '李四',
-					level: 10,
-					prizeImg: 'https://img.showgo.gg/cards/4_60186.webp?x-oss-process=image/resize,p_30'
-				},
-				{
-					avatar: 'https://img.showgo.gg/avatar1/default_14.webp',
-					price: '300.00',
-					name: '王五',
-					level: 21,
-					prizeImg: 'https://img.showgo.gg/cards/4_66324.webp?x-oss-process=image/resize,p_30'
-				}
-			]
+const handleTabChange = ({ index, item }) => {
+	console.log(item)
+	productList.value = []
+	fetchProductList(index)
+}
 
+const initData = () => {
+	console.log(currentTabIndex.value)
+	loading.value = true
+	bannerList.value = []
+	headerList.value = []
+	productList.value = [{}, {}]
+	fetchHomeBaseData()
+	const promises = [getList(), getBoxData(), getUserDrawLog()]
+	Promise.all(promises)
+		.then(([listRes, boxDataRes, userDrawLogRes]) => {
 			loading.value = false
-		}, 2000)
-	}
+			bannerList.value = adaptScheduleBanner(listRes)
+			headerList.value = adaptHeaderList(userDrawLogRes)
+			productList.value = adaptProductList(boxDataRes)
+		}).catch((error) => {
+			loading.value = false
+			console.error('Error fetching home data:', error)
+		})
+}
 
-	const fetchProductList = (categoryId = 0) => {
-		productList.value = [{}, {}, ]
-		setTimeout(() => {
-			productList.value = [{
-					id: 1,
-					image: 'https://img.showgo.gg/goodsCate/images/20260104/f436244fc21021bc600e72021c7fac5e.webp?v=2026-03-17%2017:57:51',
-					stock: '66716',
-					title: categoryId === 0 ? 'Bút chì nhỏ Shin: Kịch tính cưỡi ngay' :
-						`Sản phẩm danh mục ${categoryId}`,
-					salesNum: '22418',
-					salesText: 'đã bán trong 3 giờ gần đây',
-					currency: 'RM',
-					price: '0.89'
-				},
-				{
-					id: 2,
-					image: 'https://img.showgo.gg/goodsCate/images/20260104/f436244fc21021bc600e72021c7fac5e.webp?v=2026-03-17%2017:57:51',
-					stock: '66716',
-					title: categoryId === 0 ? 'Bút chì nhỏ Shin: Kịch tính cưỡi ngay' :
-						`Sản phẩm danh mục ${categoryId}`,
-					salesNum: '22418',
-					salesText: 'đã bán trong 3 giờ gần đây',
-					currency: 'RM',
-					price: '0.89'
-				},
+const fetchHomeBaseData = () => {
 
-			]
-		}, 2000)
-	}
+}
 
-	onMounted(() => {
-		fetchHomeBaseData()
-		fetchProductList(currentTabIndex.value)
-	})
+const fetchProductList = (categoryId = 0) => {
+
+}
+
+onMounted(() => {
+	initData()
+
+})
 </script>
 
 <style lang="scss" scoped>
-	.home-page {
-		background-color: #f6f6fa;
-		min-height: calc(100vh - var(--window-bottom));
+.home-page {
+	background-color: #f6f6fa;
+	min-height: calc(100vh - var(--window-bottom));
 
-		&__logo {
-			width: 100%;
-			height: 54rpx;
-			display: block;
-		}
-
-		&__search {
-			width: 100%;
-			height: 60rpx;
-			background-color: #f0f2f5;
-			border-radius: 30rpx;
-			padding: 0 24rpx;
-			font-size: 26rpx;
-		}
+	&__logo {
+		width: 100%;
+		height: 54rpx;
+		display: block;
 	}
 
-	.product-grid {
-		display: grid;
-		grid-template-columns: repeat(2, 1fr);
-		gap: 20rpx 22rpx;
-		padding: 32rpx;
-
-		&__item {
-			width: 100%;
-		}
+	&__search {
+		width: 100%;
+		height: 60rpx;
+		background-color: #f0f2f5;
+		border-radius: 30rpx;
+		padding: 0 24rpx;
+		font-size: 26rpx;
 	}
+
+	&__language-trigger {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		width: 64rpx;
+		height: 64rpx;
+		border-radius: 14rpx;
+		background: #ffffff;
+		box-shadow: 0 8rpx 20rpx rgba(15, 23, 42, 0.06);
+	}
+
+	&__language-icon {
+		width: 52rpx;
+		height: 44rpx;
+		display: block;
+	}
+
+	&__actions {
+		display: flex;
+		align-items: center;
+		justify-content: flex-end;
+		gap: 12rpx;
+		width: 100%;
+	}
+
+	&__auth-button {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		min-width: 126rpx;
+		height:30px;
+		padding: 0 10rpx;
+		border-radius: 6rpx;
+		background: #101010;
+	}
+
+	&__auth-text {
+		font-size: 22rpx;
+		font-weight: 600;
+		line-height: 1;
+		color: #ffffff;
+		white-space: nowrap;
+	}
+}
+
+.product-grid {
+	display: grid;
+	grid-template-columns: repeat(2, 1fr);
+	gap: 20rpx 22rpx;
+	padding: 32rpx;
+
+	&__item {
+		width: 100%;
+	}
+}
 </style>

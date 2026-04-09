@@ -90,7 +90,7 @@ const props = defineProps({
 	rightWidth: { type: [Number, String], default: '' },
 	contentMaxWidth: { type: [Number, String], default: '' },
 	bottomHeight: { type: [Number, String], default: 0 },
-	zIndex: { type: Number, default: 998 },
+	zIndex: { type: Number, default: 10 },
 	background: { type: String, default: '#ffffff' },
 	backgroundImage: { type: String, default: '' },
 	backgroundOpacity: { type: Number, default: 1 },
