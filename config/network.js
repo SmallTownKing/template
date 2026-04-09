@@ -46,6 +46,7 @@ export const COMPANY_CODE_MAP = {
 	production: getEnvValue('VITE_COMPANY_CODE_PROD', '')
 }
 export const COMPANY_CODE_HEADER_KEY = 'company-code'
+export const TOKEN_HEADER_KEY = 'token'
 export const LANG_HEADER_KEY = 'lang'
 export const REQUEST_TIMEOUT = getNumberEnvValue('VITE_REQUEST_TIMEOUT', 15000)
 export const H5_PROXY_ENABLED = getBooleanEnvValue('VITE_H5_PROXY_ENABLED', true)
@@ -86,6 +87,7 @@ export default {
 	COMPANY_CODE_MAP,
 	COMPANY_CODE,
 	COMPANY_CODE_HEADER_KEY,
+	TOKEN_HEADER_KEY,
 	LANG_HEADER_KEY,
 	DEFAULT_REQUEST_HEADERS,
 	REQUEST_TIMEOUT,

@@ -2,7 +2,7 @@
   <view class="custom-tabs">
     <view
       class="tab-item"
-      v-for="(item, index) in list"
+      v-for="(item, index) in displayList"
       :key="index"
       @click="handleTabClick(index, item)"
     >
@@ -12,7 +12,6 @@
         :src="item.icon"
         mode="aspectFit"
       />
-
       <view class="tab-text-wrap">
         <text 
           class="tab-text" 
@@ -20,7 +19,6 @@
         >
           {{ item.name }}
         </text>
-        
         <view 
           class="tab-line" 
           :class="{ 'is-active': modelValue === index }"
@@ -31,57 +29,64 @@
 </template>
 
 <script setup>
+import { computed } from 'vue'
+import { useAppI18n } from '@/i18n' 
+
+const { t } = useAppI18n()
+
 const props = defineProps({
-  // 当前激活的 tab 索引
   modelValue: {
     type: Number,
     default: 0
   },
-  // Tab 列表数据
   list: {
     type: Array,
-    default: () => [
-      { 
-        name: 'Đang bán', 
-        // 请替换为你实际的本地图片路径或网络链接
-        icon: '/static/icons/flame.png' 
-      },
-      { 
-        name: 'Giao dịch thành công', 
-        icon: '/static/icons/gavel.png' 
-      }
-    ]
+    default: () => [] 
   }
 })
 
 const emit = defineEmits(['update:modelValue', 'change'])
 
+// 【修改点 4】：用 computed 包装一下，这样就能安全地使用 t 函数了
+const displayList = computed(() => {
+  // 如果父组件传了数据，就用父组件的
+  if (props.list && props.list.length > 0) {
+    return props.list
+  }
+  // 如果父组件没传，使用这里的默认多语言配置
+  return [
+    { 
+      name: t('market_003'), 
+      icon: '/static/tabs/8.png' 
+    },
+    { 
+      name: t('market_004'), 
+      icon: '/static/tabs/9.png' 
+    }
+  ]
+})
+
 const handleTabClick = (index, item) => {
   if (props.modelValue === index) return
   
-  // 触发双向绑定更新
   emit('update:modelValue', index)
-  // 触发 change 事件供父组件监听
   emit('change', { index, item })
 }
 </script>
 
 <style lang="scss" scoped>
+/* =========== CSS 部分完全不需要改动 =========== */
 .custom-tabs {
   display: flex;
   align-items: center;
-  /* 去除背景色，由父组件决定 */
   background-color: transparent; 
-  padding: 20rpx 32rpx;
-  /* 控制两个 Tab 之间的间距 */
+  padding: 26rpx 32rpx;
   column-gap: 48rpx; 
 
   .tab-item {
     display: flex;
     align-items: center;
-    /* 图标和文字的间距 */
     column-gap: 12rpx; 
-    /* H5 端增加鼠标手势 */
     cursor: pointer; 
   }
 
@@ -102,31 +107,27 @@ const handleTabClick = (index, item) => {
 
   .tab-text {
     font-size: 30rpx;
-    color: #6b7280; /* 未激活时的灰黑色，参考图片右侧 */
-    font-weight: 500;
+    color: #6b7280; 
+    font-weight: 500; 
     transition: color 0.3s ease;
 
     &.is-active {
-      color: #111827; /* 激活时的纯黑色，参考图片左侧 */
-      font-weight: 600;
+      color: #111827;
     }
   }
 
   .tab-line {
     position: absolute;
-    /* 调整线条距离文字底部的距离 */
     bottom: -14rpx; 
     left: 50%;
-    /* 默认缩放为0 (隐藏) */
     transform: translateX(-50%) scaleX(0); 
-    width: 40rpx; /* 红线的宽度 */
-    height: 6rpx; /* 红线的粗细 */
-    background-color: #ff2a2a; /* 红色 */
-    border-radius: 6rpx;
+    width: 40rpx;
+    height: 5rpx;
+    background-color: #ff2a2a; 
+    border-radius: 5rpx;
     transition: transform 0.3s ease-out;
 
     &.is-active {
-      /* 激活时缩放为1 (展示) */
       transform: translateX(-50%) scaleX(1); 
     }
   }

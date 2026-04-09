@@ -7,7 +7,10 @@ export const getSiteInfo = (params = {}, options = {}) => {
 }
 
 export const passwordLogin = (data = {}, options = {}) => {
-    return request.post(`${USER_API_PREFIX}/login/passwordLogin`, data, options)
+    return request.post(`${USER_API_PREFIX}/login/passwordLogin`, data, {
+        skipAuthPopup: true,
+        ...options
+    })
 }
 
 export const getUserAccount = (params = {}, options = {}) => {

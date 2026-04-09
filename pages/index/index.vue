@@ -1,51 +1,52 @@
 <template>
-	<view class="home-page">
-		<base-navbar left-width="294rpx" right-width="376rpx" shadow @ready="handleNavbarReady">
-			<template #left>
-				<image class="home-page__logo" src="/static/background/home-head.png" mode="aspectFit" />
-			</template>
-			<template #right>
-				<view class="home-page__actions">
-					<view class="home-page__language-trigger" @tap.stop="toggleLanguageDropdown">
-						<image class="home-page__language-icon" :src="currentLocaleIcon" mode="aspectFit" />
+	<base-page-shell>
+		<view class="home-page">
+			<base-navbar left-width="294rpx" right-width="376rpx" shadow @ready="handleNavbarReady">
+				<template #left>
+					<image class="home-page__logo" src="/static/background/home-head.png" mode="aspectFit" />
+				</template>
+				<template #right>
+					<view class="home-page__actions">
+						<view class="home-page__language-trigger" @tap.stop="toggleLanguageDropdown">
+							<image class="home-page__language-icon" :src="currentLocaleIcon" mode="aspectFit" />
+						</view>
+						<view v-if="!isLogin" class="home-page__auth-button" @tap="handleAuthTap">
+							<text class="home-page__auth-text">{{ t('home_011') }}</text>
+						</view>
 					</view>
-					<view v-if="!isLogin" class="home-page__auth-button" @tap="handleAuthTap">
-						<text class="home-page__auth-text">{{ t('home_011') }}</text>
-					</view>
+				</template>
+			</base-navbar>
+			<home-language-dropdown
+				:show="isLanguageDropdownVisible"
+				:top="navbarHeight"
+				:locales="supportedLocales"
+				:current-locale="locale"
+				@close="closeLanguageDropdown"
+				@select="handleLocaleSelect"
+			/>
+			<home-hero-banner :list="bannerList" />
+			<home-shortcut-grid :loading="loading" @click="handleSectionClick" />
+			<home-section-header :list="headerList" />
+			<home-category-tabs v-model="currentTabIndex" :loading="loading" @change="handleTabChange" />
+			<view class="product-grid">
+				<view v-for="(item, index) in productList" :key="item.id || index" class="product-grid__item">
+					<home-product-card :item="item" @click="handleProductClick" />
 				</view>
-			</template>
-		</base-navbar>
-		<home-language-dropdown
-			:show="isLanguageDropdownVisible"
-			:top="navbarHeight"
-			:locales="supportedLocales"
-			:current-locale="locale"
-			@close="closeLanguageDropdown"
-			@select="handleLocaleSelect"
-		/>
-		<base-login ref="loginPopupRef" @submit="handleLoginSubmit" />
-		<home-hero-banner :list="bannerList" />
-		<home-shortcut-grid :loading="loading" @click="handleSectionClick" />
-		<home-section-header :list="headerList" />
-		<home-category-tabs v-model="currentTabIndex" :loading="loading" @change="handleTabChange" />
-		<view class="product-grid">
-			<view v-for="(item, index) in productList" :key="item.id || index" class="product-grid__item">
-				<home-product-card :item="item" @click="handleProductClick" />
 			</view>
 		</view>
-	</view>
+	</base-page-shell>
 </template>
 
 <script setup>
 import { computed, onMounted, ref } from 'vue'
 import { useAppI18n } from '@/i18n'
-import { useAppStore } from '@/stores'
-import { getList, getUserDrawLog, getBoxData, } from '@/apis/home'
-import { passwordLogin } from '@/apis/user'
+import { useAppStore, useAuthPopupStore } from '@/stores'
+import { getList, getUserDrawLog, getBoxData, getSaleBoxOpenLog } from '@/apis/home'
 import { adaptScheduleBanner, adaptHeaderList, adaptProductList } from './adapter'
 
 const { locale, setLocale, supportedLocales, t } = useAppI18n()
 const appStore = useAppStore()
+const authPopupStore = useAuthPopupStore()
 const currentTabIndex = ref(0)
 const bannerList = ref([])
 const headerList = ref([])
@@ -53,12 +54,12 @@ const productList = ref([{}, {}])
 const loading = ref(true)
 const navbarHeight = ref(88)
 const isLanguageDropdownVisible = ref(false)
-const loginPopupRef = ref(null)
 const localeIconMap = {
 	'zh-Hans': '/static/lanuage/zh.webp',
 	en: '/static/lanuage/en.webp',
 	vi: '/static/lanuage/ms.webp'
 }
+
 const currentLocaleIcon = computed(() => {
 	return localeIconMap[locale.value] || localeIconMap['zh-Hans']
 })
@@ -68,37 +69,37 @@ const isLogin = computed(() => appStore.isLogin)
 const handleNavbarReady = (payload) => {
 	navbarHeight.value = payload.totalHeight || 88
 }
+
 const toggleLanguageDropdown = () => {
 	isLanguageDropdownVisible.value = !isLanguageDropdownVisible.value
 }
+
 const closeLanguageDropdown = () => {
 	isLanguageDropdownVisible.value = false
 }
+
 const handleLocaleSelect = (item) => {
-	if (item && item.code) {
+	if (item?.code) {
 		setLocale(item.code)
 	}
+
 	closeLanguageDropdown()
 }
-const handleSectionClick = (payload) => {
-	console.log('clicked shortcut section', payload)
-}
 
-const handleLoginSubmit = (payload) => {
-	passwordLogin({mobile: payload.phone, password: payload.password}).then(res => {
+const handleSectionClick = () => {}
+
+const handleAuthTap = () => {
+	authPopupStore.open({
+		source: 'home-auth-button'
 	})
 }
 
-const handleAuthTap = () => {
-	loginPopupRef.value?.open()
-}
-
 const handleProductClick = (item) => {
+	getSaleBoxOpenLog({ id: 4 }).catch(() => {})
 	console.log('clicked product, ready to navigate detail', item.id)
 }
 
-const handleTabChange = ({ index, item }) => {
-	console.log(item)
+const handleTabChange = ({ index }) => {
 	productList.value = []
 	fetchProductList(index)
 }
@@ -108,30 +109,24 @@ const initData = () => {
 	bannerList.value = []
 	headerList.value = []
 	productList.value = [{}, {}]
-	const promises = [getList(), getBoxData(), getUserDrawLog()]
-	Promise.all(promises)
+
+	Promise.all([getList(), getBoxData(), getUserDrawLog()])
 		.then(([listRes, boxDataRes, userDrawLogRes]) => {
 			loading.value = false
 			bannerList.value = adaptScheduleBanner(listRes)
 			headerList.value = adaptHeaderList(userDrawLogRes)
 			productList.value = adaptProductList(boxDataRes)
-		}).catch((error) => {
+		})
+		.catch((error) => {
 			loading.value = false
 			console.error('Error fetching home data:', error)
 		})
 }
 
-const fetchHomeBaseData = () => {
-
-}
-
-const fetchProductList = (categoryId = 0) => {
-
-}
+const fetchProductList = () => {}
 
 onMounted(() => {
 	initData()
-
 })
 </script>
 
@@ -185,7 +180,7 @@ onMounted(() => {
 		align-items: center;
 		justify-content: center;
 		min-width: 126rpx;
-		height:30px;
+		height: 30px;
 		padding: 0 10rpx;
 		border-radius: 6rpx;
 		background: #101010;

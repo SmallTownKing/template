@@ -50,28 +50,28 @@ const list = computed(() => [
 	{
 		id: 1,
 		title: t('home_001'),
-		icon: '/static/images/icons/chest.png',
+		icon: '/static/icons/chest.png',
 		imgWidth: '74rpx',
 		imgHeight: '64.28rpx'
 	},
 	{
 		id: 2,
 		title: t('home_002'),
-		icon: '/static/images/icons/trophy.png',
+		icon: '/static/icons/trophy.png',
 		imgWidth: '90rpx',
 		imgHeight: '90rpx'
 	},
 	{
 		id: 3,
 		title: t('home_003'),
-		icon: '/static/images/icons/gift.png',
+		icon: '/static/icons/gift.png',
 		imgWidth: '80rpx',
 		imgHeight: '80rpx'
 	},
 	{
 		id: 4,
 		title: t('home_004'),
-		icon: '/static/images/icons/share.png',
+		icon: '/static/icons/share.png',
 		imgWidth: '92rpx',
 		imgHeight: '90rpx'
 	}
