@@ -1,7 +1,7 @@
 <template>
 	<view class="congrats">
 		<view class="congrats__bg-container">
-			<image class="congrats__bg-img" src="/static/images/congrats-bg.png" mode="scaleToFill" />
+			<image class="congrats__bg-img" src="/static/background/congrats-bg.png" mode="scaleToFill" />
 
 			<view class="congrats__more" @click="handleMore">
 				{{ t('home_005') }} <text class="arrow">›</text>

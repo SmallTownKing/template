@@ -211,7 +211,7 @@ const handleSubmit = () => {
     
     emit('submit', {
         type: isLoginMode.value ? 'login' : 'register',
-        phone: localPhone.value, // 【修复】：使用本地手机号
+        phone: localPhone.value, 
         areaCode: props.areaCode,
         password: password.value,
         smsCode: isLoginMode.value ? undefined : smsCode.value

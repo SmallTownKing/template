@@ -1,6 +1,6 @@
 <template>
 	<view class="reward-card">
-		<image src="/static/images/background/card.png" class="reward-card__bg"></image>
+		<image src="/static/background/card.png" class="reward-card__bg"></image>
 
 		<block v-if="loading">
 			<view class="reward-card__content">
@@ -74,6 +74,7 @@
 		flex-direction: column;
 		justify-content: center;
 		overflow: hidden;
+		margin-top: 34rpx;
 
 		&__bg {
 			position: absolute;

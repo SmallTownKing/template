@@ -6,3 +6,10 @@ export const getSiteInfo = (params = {}, options = {}) => {
     return request.get(`${USER_API_PREFIX}/config/getSiteInfo`, params, options)
 }
 
+export const passwordLogin = (data = {}, options = {}) => {
+    return request.post(`${USER_API_PREFIX}/login/passwordLogin`, data, options)
+}
+
+export const getUserAccount = (params = {}, options = {}) => {
+    return request.get(`${USER_API_PREFIX}/account/getUserAccount`, params, options)
+}

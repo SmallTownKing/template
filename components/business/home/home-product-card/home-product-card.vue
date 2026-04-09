@@ -50,14 +50,14 @@
 		return !props.item || Object.keys(props.item).length === 0
 	})
 	const ICON_MAP = {
-		'cube': '/static/images/icons/cube-yellow.png',
-		'coin': '/static/images/icons/coin-gold.png',
-		'gem': '/static/images/icons/gem-blue.png',
-		'ticket': '/static/images/icons/ticket-red.png'
+		'cube': '/static/icons/cube-yellow.png',
+		'coin': '/static/icons/coin-gold.png',
+		'gem': '/static/icons/gem-blue.png',
+		'ticket': '/static/icons/ticket-red.png'
 	}
 
 	const getIconByType = (type) => {
-		return ICON_MAP[type] || '/static/images/icons/cube-yellow.png'
+		return ICON_MAP[type] || '/static/icons/cube-yellow.png'
 	}
 	const handleClick = () => {
 		if (isEmpty.value) return

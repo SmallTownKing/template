@@ -2,7 +2,7 @@
 	<view class="home-page">
 		<base-navbar left-width="294rpx" right-width="376rpx" shadow @ready="handleNavbarReady">
 			<template #left>
-				<image class="home-page__logo" src="/static/images/home-head.png" mode="aspectFit" />
+				<image class="home-page__logo" src="/static/background/home-head.png" mode="aspectFit" />
 			</template>
 			<template #right>
 				<view class="home-page__actions">
@@ -23,7 +23,7 @@
 			@close="closeLanguageDropdown"
 			@select="handleLocaleSelect"
 		/>
-		<base-login ref="loginPopupRef" />
+		<base-login ref="loginPopupRef" @submit="handleLoginSubmit" />
 		<home-hero-banner :list="bannerList" />
 		<home-shortcut-grid :loading="loading" @click="handleSectionClick" />
 		<home-section-header :list="headerList" />
@@ -40,7 +40,8 @@
 import { computed, onMounted, ref } from 'vue'
 import { useAppI18n } from '@/i18n'
 import { useAppStore } from '@/stores'
-import { getList, getUserDrawLog, getBoxData } from '@/apis/home'
+import { getList, getUserDrawLog, getBoxData, } from '@/apis/home'
+import { passwordLogin } from '@/apis/user'
 import { adaptScheduleBanner, adaptHeaderList, adaptProductList } from './adapter'
 
 const { locale, setLocale, supportedLocales, t } = useAppI18n()
@@ -83,6 +84,11 @@ const handleSectionClick = (payload) => {
 	console.log('clicked shortcut section', payload)
 }
 
+const handleLoginSubmit = (payload) => {
+	passwordLogin({mobile: payload.phone, password: payload.password}).then(res => {
+	})
+}
+
 const handleAuthTap = () => {
 	loginPopupRef.value?.open()
 }
@@ -98,12 +104,10 @@ const handleTabChange = ({ index, item }) => {
 }
 
 const initData = () => {
-	console.log(currentTabIndex.value)
 	loading.value = true
 	bannerList.value = []
 	headerList.value = []
 	productList.value = [{}, {}]
-	fetchHomeBaseData()
 	const promises = [getList(), getBoxData(), getUserDrawLog()]
 	Promise.all(promises)
 		.then(([listRes, boxDataRes, userDrawLogRes]) => {
@@ -163,8 +167,8 @@ onMounted(() => {
 	}
 
 	&__language-icon {
-		width: 52rpx;
-		height: 44rpx;
+		width: 32px;
+		height: 30px;
 		display: block;
 	}
 
@@ -172,7 +176,7 @@ onMounted(() => {
 		display: flex;
 		align-items: center;
 		justify-content: flex-end;
-		gap: 12rpx;
+		gap: 24rpx;
 		width: 100%;
 	}
 
