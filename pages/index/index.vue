@@ -16,33 +16,31 @@
 					</view>
 				</template>
 			</base-navbar>
-			<home-language-dropdown
-				:show="isLanguageDropdownVisible"
-				:top="navbarHeight"
-				:locales="supportedLocales"
-				:current-locale="locale"
-				@close="closeLanguageDropdown"
-				@select="handleLocaleSelect"
-			/>
+			<home-language-dropdown :show="isLanguageDropdownVisible" :top="navbarHeight" :locales="supportedLocales"
+				:current-locale="locale" @close="closeLanguageDropdown" @select="handleLocaleSelect" />
 			<home-hero-banner :list="bannerList" />
 			<home-shortcut-grid :loading="loading" @click="handleSectionClick" />
 			<home-section-header :list="headerList" />
-			<home-category-tabs v-model="currentTabIndex" :loading="loading" @change="handleTabChange" />
+			<home-category-tabs v-model="currentTabIndex" :loading="loading" @ready="handleTabReady"
+				@change="handleTabChange" />
 			<view class="product-grid">
 				<view v-for="(item, index) in productList" :key="item.id || index" class="product-grid__item">
 					<home-product-card :item="item" @click="handleProductClick" />
 				</view>
 			</view>
+			<base-load-status v-if="productList.every(item => item.id)" status="finished" />
 		</view>
 	</base-page-shell>
 </template>
 
 <script setup>
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
+import { onHide, onShow, onUnload } from '@dcloudio/uni-app'
 import { useAppI18n } from '@/i18n'
 import { useAppStore, useAuthPopupStore } from '@/stores'
 import { getList, getUserDrawLog, getBoxData } from '@/apis/home'
 import { adaptScheduleBanner, adaptHeaderList, adaptProductList } from './adapter'
+import { createHomeSocketEntry } from './socket'
 
 const { locale, setLocale, supportedLocales, t } = useAppI18n()
 const appStore = useAppStore()
@@ -50,10 +48,11 @@ const authPopupStore = useAuthPopupStore()
 const currentTabIndex = ref(0)
 const bannerList = ref([])
 const headerList = ref([])
-const productList = ref([{}, {}])
+const productList = ref([{}, {}, {}, {}])
 const loading = ref(true)
 const navbarHeight = ref(88)
 const isLanguageDropdownVisible = ref(false)
+const currentCategoryId = ref(0)
 const localeIconMap = {
 	'zh-Hans': '/static/lanuage/zh.webp',
 	en: '/static/lanuage/en.webp',
@@ -65,6 +64,25 @@ const currentLocaleIcon = computed(() => {
 })
 
 const isLogin = computed(() => appStore.isLogin)
+
+const homeSocket = createHomeSocketEntry({
+	getCurrentCategoryId: () => currentCategoryId.value,
+	onBannerUpdate: (payload) => {
+		bannerList.value = adaptScheduleBanner(payload)
+	},
+	onHeaderUpdate: (payload) => {
+		headerList.value = adaptHeaderList(payload)
+	},
+	onProductUpdate: (payload, meta = {}) => {
+		const payloadCategoryId = Number(meta.categoryId || 0)
+
+		if (payloadCategoryId && payloadCategoryId !== currentCategoryId.value) {
+			return
+		}
+
+		productList.value = adaptProductList(payload)
+	}
+})
 
 const handleNavbarReady = (payload) => {
 	navbarHeight.value = payload.totalHeight || 88
@@ -86,7 +104,7 @@ const handleLocaleSelect = (item) => {
 	closeLanguageDropdown()
 }
 
-const handleSectionClick = () => {}
+const handleSectionClick = () => { }
 
 const handleAuthTap = () => {
 	authPopupStore.open({
@@ -95,21 +113,31 @@ const handleAuthTap = () => {
 }
 
 const handleProductClick = (item) => {
-	console.log('clicked product, ready to navigate detail', item.id)
+	if (!appStore.isLogin) {
+		authPopupStore.open({
+			source: 'home-auth-button'
+		})
+	}
 }
 
-const handleTabChange = ({ index }) => {
-	productList.value = []
-	fetchProductList(index)
+const handleTabReady = ({ index, item }) => {
+	currentTabIndex.value = index
+	currentCategoryId.value = Number(item?.id || 0)
+}
+
+const handleTabChange = ({ index, item }) => {
+	currentTabIndex.value = index
+	currentCategoryId.value = Number(item?.id || 0)
+	fetchProductList(item?.id)
 }
 
 const initData = () => {
 	loading.value = true
 	bannerList.value = []
 	headerList.value = []
-	productList.value = [{}, {}]
+	productList.value = [{}, {}, {}, {}]
 
-	Promise.all([getList(), getBoxData({category_id: 11}), getUserDrawLog()])
+	Promise.all([getList(), getBoxData({ category_id: currentCategoryId.value }), getUserDrawLog()])
 		.then(([listRes, boxDataRes, userDrawLogRes]) => {
 			loading.value = false
 			bannerList.value = adaptScheduleBanner(listRes)
@@ -122,10 +150,46 @@ const initData = () => {
 		})
 }
 
-const fetchProductList = () => {}
+const fetchProductList = (categoryId = currentCategoryId.value) => {
+	const nextCategoryId = Number(categoryId || 0)
+
+	if (!nextCategoryId) {
+		productList.value = []
+		return
+	}
+
+	productList.value = [{}, {}, {}, {}]
+	getBoxData({ category_id: nextCategoryId })
+		.then((response) => {
+			productList.value = adaptProductList(response)
+		})
+		.catch((error) => {
+			productList.value = []
+			console.error('Error fetching product list:', error)
+		})
+}
+
+watch(
+	() => currentCategoryId.value,
+	(nextCategoryId) => {
+		homeSocket.updateCategory(nextCategoryId)
+	}
+)
 
 onMounted(() => {
 	initData()
+})
+
+onShow(() => {
+	homeSocket.connect()
+})
+
+onHide(() => {
+	homeSocket.disconnect()
+})
+
+onUnload(() => {
+	homeSocket.disconnect()
 })
 </script>
 

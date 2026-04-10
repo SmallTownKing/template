@@ -26,26 +26,37 @@
 			/>
 			<card-release-hero-banner :list="bannerList" />
 			<card-release-income-panel :loading="loading" />
-			<card-release-tabs v-model="currentTab" :loading="loading" />
+			<card-release-tabs
+				v-model="currentTab"
+				:loading="loading"
+				@ready="handleTabReady"
+				@change="handleTabChange"
+			/>
 			<view class="product-grid">
 				<view v-for="(item, index) in productList" :key="item.id || index" class="product-grid__item">
 					<card-release-product-card :item="item" />
 				</view>
 			</view>
+			<base-load-status v-if="productList.every(item => item.id)" status="finished" loadingText="" />
 		</view>
 	</base-page-shell>
 </template>
 
 <script setup>
-import { computed, onMounted, ref } from 'vue'
+import { computed, ref } from 'vue'
 import { useAppI18n } from '@/i18n'
 import { useAppStore, useAuthPopupStore } from '@/stores'
 import { adaptProductList, adaptScheduleBanner } from './adapter'
 import { getBoxData } from '@/apis/card'
 
+const FIXED_CATEGORY_ID = 2
+const FIXED_TYPE = 3
+
 const currentTab = ref(0)
+const currentCardType = ref(0)
+const hasInitialized = ref(false)
 const bannerList = ref([])
-const productList = ref([{}, {}])
+const productList = ref([{}, {}, {}, {}])
 const loading = ref(true)
 const navbarHeight = ref(88)
 const isLanguageDropdownVisible = ref(false)
@@ -89,25 +100,52 @@ const handleLocaleSelect = (item) => {
 	closeLanguageDropdown()
 }
 
-const initData = () => {
-	loading.value = true
-	bannerList.value = []
-	productList.value = [{}, {}]
-	Promise.all([getBoxData()])
-		.then(([boxDataRes]) => {
-			loading.value = false
-			bannerList.value = adaptScheduleBanner({})
-			productList.value = adaptProductList(boxDataRes)
+const fetchProductList = async (cardType = currentCardType.value, nextLoading = false) => {
+	const nextCardType = Number(cardType || 0)
+	if (!nextCardType) {
+		productList.value = []
+		return
+	}
+	if (nextLoading) {
+		loading.value = true
+	}
+
+	productList.value = [{}, {}, {}, {}]
+
+	try {
+		const response = await getBoxData({
+			category_id: FIXED_CATEGORY_ID,
+			type: FIXED_TYPE,
+			card_type: nextCardType
 		})
-		.catch((error) => {
+
+		bannerList.value = adaptScheduleBanner({})
+		productList.value = adaptProductList(response)
+	} catch (error) {
+		productList.value = []
+		console.error('Error fetching card release data:', error)
+	} finally {
+		if (nextLoading) {
 			loading.value = false
-			console.error('Error fetching card release data:', error)
-		})
+		}
+	}
 }
 
-onMounted(() => {
-	initData()
-})
+const handleTabReady = ({ index, item }) => {
+	currentTab.value = index
+	currentCardType.value = Number(item?.cardType || 0)
+
+	if (!hasInitialized.value) {
+		hasInitialized.value = true
+		fetchProductList(currentCardType.value, true)
+	}
+}
+
+const handleTabChange = ({ index, item }) => {
+	currentTab.value = index
+	currentCardType.value = Number(item?.cardType || 0)
+	fetchProductList(currentCardType.value)
+}
 </script>
 
 <style lang="scss" scoped>

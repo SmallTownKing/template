@@ -1,18 +1,26 @@
 <template>
   <view class="custom-tabs">
-
     <block v-if="loading">
-      <view class="tab-item skeleton-item" v-for="i in 2" :key="i">
+      <view v-for="i in 2" :key="i" class="tab-item skeleton-item">
         <view class="skeleton-icon"></view>
         <view class="skeleton-text"></view>
       </view>
     </block>
     <block v-else>
-      <view class="tab-item" v-for="(item, index) in displayList" :key="index"
-        :class="{ 'is-active': modelValue === index }" @click="handleTabClick(index, item)">
+      <view
+        v-for="(item, index) in displayList"
+        :key="item.cardType || index"
+        class="tab-item"
+        :class="{ 'is-active': modelValue === index }"
+        @click="handleTabClick(index, item)"
+      >
         <block v-if="item.icon || item.image">
-          <image v-if="item.image" class="tab-icon-img"
-            :src="modelValue === index ? (item.activeImage || item.image) : item.image" mode="aspectFit" />
+          <image
+            v-if="item.image"
+            class="tab-icon-img"
+            :src="modelValue === index ? (item.activeImage || item.image) : item.image"
+            mode="aspectFit"
+          />
           <text v-else class="tab-icon-text">{{ item.icon }}</text>
         </block>
         <text class="tab-text">{{ item.text }}</text>
@@ -22,7 +30,7 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { computed, onMounted, watch } from 'vue'
 import { useAppI18n } from '@/i18n'
 
 const { t } = useAppI18n()
@@ -42,7 +50,7 @@ const props = defineProps({
   }
 })
 
-const emit = defineEmits(['update:modelValue', 'change'])
+const emit = defineEmits(['update:modelValue', 'change', 'ready'])
 
 const displayList = computed(() => {
   if (props.list && props.list.length > 0) {
@@ -50,10 +58,23 @@ const displayList = computed(() => {
   }
 
   return [
-    { text: t('card_001'), image: '/static/tabs/7.png', activeImage: '/static/tabs/7-red.png' },
-    { text: t('card_002'), image: '/static/tabs/6.png', activeImage: '/static/tabs/6-red.png' }
+    { text: t('card_001'), image: '/static/tabs/7.png', activeImage: '/static/tabs/7-red.png', cardType: 1 },
+    { text: t('card_002'), image: '/static/tabs/6.png', activeImage: '/static/tabs/6-red.png', cardType: 2 }
   ]
 })
+
+const emitCurrentItem = () => {
+  const currentItem = displayList.value[props.modelValue]
+
+  if (!currentItem) {
+    return
+  }
+
+  emit('ready', {
+    index: props.modelValue,
+    item: currentItem
+  })
+}
 
 const handleTabClick = (index, item) => {
   if (props.modelValue === index) return
@@ -61,6 +82,20 @@ const handleTabClick = (index, item) => {
   emit('update:modelValue', index)
   emit('change', { index, item })
 }
+
+watch(
+  () => [props.modelValue, displayList.value],
+  () => {
+    emitCurrentItem()
+  },
+  {
+    immediate: true
+  }
+)
+
+onMounted(() => {
+  emitCurrentItem()
+})
 </script>
 
 <style lang="scss" scoped>
@@ -104,7 +139,7 @@ const handleTabClick = (index, item) => {
     }
 
     &.is-active {
-      background-color: #FFFFFF;
+      background-color: #ffffff;
       color: #111111;
       box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.04);
       filter: grayscale(0%);

@@ -187,7 +187,6 @@ const handleSendCode = () => {
     }, 1000)
 }
 
-// 【修复】：计算按钮高亮逻辑，使用 localPhone 替代 props.phone
 const isSubmitActive = computed(() => {
     const hasPhone = localPhone.value && localPhone.value.length > 0
     const hasPassword = password.value && password.value.length > 0

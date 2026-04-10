@@ -22,8 +22,8 @@
 
 				<block v-else>
 					<view
-						v-for="(item, index) in list"
-						:key="index"
+						v-for="(item, index) in tabList"
+						:key="item.id || index"
 						:id="'tab-' + index"
 						class="tab-item"
 						:class="{ 'tab-item--active': modelValue === index }"
@@ -55,27 +55,47 @@
 </template>
 
 <script setup>
-import { computed, ref } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import { useAppI18n } from '@/i18n'
 
 const { t } = useAppI18n()
 
-const list = computed(() => [
-	{ id: '1', name: t('home_006'), icon: '/static/tabs/1.png', activeIcon: '/static/tabs/1-orange.png', iconWidth: 50, iconHeight: 50, marginRight: -1 },
-	{ id: '2', name: t('home_007'), icon: '/static/tabs/2.png', activeIcon: '/static/tabs/2-orange.png', iconWidth: 54, iconHeight: 54, marginRight: 4 },
+const defaultList = computed(() => [
+	{ id: '11', name: t('home_006'), icon: '/static/tabs/1.png', activeIcon: '/static/tabs/1-orange.png', iconWidth: 50, iconHeight: 50, marginRight: -1 },
+	{ id: '12', name: t('home_007'), icon: '/static/tabs/2.png', activeIcon: '/static/tabs/2-orange.png', iconWidth: 54, iconHeight: 54, marginRight: 4 },
 	{ id: '3', name: t('home_008'), icon: '/static/tabs/3.png', activeIcon: '/static/tabs/3-orange.png', iconWidth: 66, iconHeight: 66, marginTop: 8, marginRight: -6 },
-	{ id: '4', name: t('home_009'), icon: '/static/tabs/4.png', activeIcon: '/static/tabs/4-orange.png', iconWidth: 36, iconHeight: 36 },
+	{ id: '1', name: t('home_009'), icon: '/static/tabs/4.png', activeIcon: '/static/tabs/4-orange.png', iconWidth: 36, iconHeight: 36 },
 	{ id: '5', name: t('home_010'), icon: '/static/tabs/5.png', activeIcon: '/static/tabs/5-orange.png', iconWidth: 40, iconHeight: 28 }
 ])
 
 const props = defineProps({
 	modelValue: { type: Number, default: 0 },
-	loading: { type: Boolean, default: false }
+	loading: { type: Boolean, default: false },
+	list: {
+		type: Array,
+		default: () => []
+	}
 })
 
-const emit = defineEmits(['update:modelValue', 'change'])
+const emit = defineEmits(['update:modelValue', 'change', 'ready'])
 
 const showLeftMask = ref(false)
+const tabList = computed(() => {
+	return props.list.length ? props.list : defaultList.value
+})
+
+const emitCurrentItem = () => {
+	const currentItem = tabList.value[props.modelValue]
+
+	if (!currentItem) {
+		return
+	}
+
+	emit('ready', {
+		index: props.modelValue,
+		item: currentItem
+	})
+}
 
 const onScroll = (e) => {
 	if (props.loading) return
@@ -87,6 +107,20 @@ const handleTabClick = (index, item) => {
 	emit('update:modelValue', index)
 	emit('change', { index, item })
 }
+
+watch(
+	() => [props.modelValue, tabList.value],
+	() => {
+		emitCurrentItem()
+	},
+	{
+		immediate: true
+	}
+)
+
+onMounted(() => {
+	emitCurrentItem()
+})
 </script>
 
 <style lang="scss" scoped>

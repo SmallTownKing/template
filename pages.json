@@ -7,30 +7,26 @@
 			}
 		},
 		{
-			"path": "pages/card-release/index",
+			"path": "pages/card/index",
 			"style": {
-				"navigationBarTitleText": "card-release",
 				"navigationStyle": "custom"
 			}
 		},
 		{
 			"path": "pages/market/index",
 			"style": {
-				"navigationBarTitleText": "market",
 				"navigationStyle": "custom"
 			}
 		},
 		{
 			"path": "pages/warehouse/index",
 			"style": {
-				"navigationBarTitleText": "warehouse",
 				"navigationStyle": "custom"
 			}
 		},
 		{
-			"path": "pages/user-center/index",
+			"path": "pages/user/index",
 			"style": {
-				"navigationBarTitleText": "user-center",
 				"navigationStyle": "custom"
 			}
 		}
@@ -56,7 +52,7 @@
 				"text": "\u6e38\u620f"
 			},
 			{
-				"pagePath": "pages/card-release/index",
+				"pagePath": "pages/card/index",
 				"iconPath": "static/tabbar/t4.png",
 				"selectedIconPath": "static/tabbar/t3.png",
 				"text": "\u5361\u724c"
@@ -74,7 +70,7 @@
 				"text": "\u4ed3\u5e93"
 			},
 			{
-				"pagePath": "pages/user-center/index",
+				"pagePath": "pages/user/index",
 				"iconPath": "static/tabbar/t10.png",
 				"selectedIconPath": "static/tabbar/t9.png",
 				"text": "\u6211\u7684"

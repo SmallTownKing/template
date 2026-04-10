@@ -25,10 +25,7 @@
         <view class="user-info">
           <view class="name-row">
             <text class="name">{{ userInfo.username }}</text>
-            <view class="level-badge" v-if="userInfo.level">
-              <text class="level-icon">V</text>
-              <text class="level-num">{{ userInfo.level }}</text>
-            </view>
+            <base-vip :level="userInfo.level"  />
           </view>
           <text class="time">发布时间: {{ userInfo.time }}</text>
         </view>
@@ -54,7 +51,9 @@
       </view>
 
       <view class="card-footer">
-        <text class="total-text">共{{ totalCount }}件: </text>
+        <text class="total-text">共
+          <text style="color: #000">{{ totalCount }}</text>
+          件: </text>
         <text class="total-price">{{ currency }}{{ totalPrice }}</text>
       </view>
     </block>
@@ -122,7 +121,6 @@ const displayGoods = computed(() => goodsList.value ? goodsList.value.slice(0, 3
   .name-row {
     display: flex;
     align-items: center;
-    margin-bottom: 6rpx;
   }
 
   .name {

@@ -1,7 +1,7 @@
 <template>
 	<view class="custom-banner">
 		<block v-if="list && list.length > 1">
-			<swiper class="swiper-container" autoplay circular :interval="3000" :duration="500" :current="currentIndex"
+			<swiper class="swiper-container" autoplay circular :interval="5000" :duration="500" :current="currentIndex"
 				@change="onSwiperChange">
 				<swiper-item v-for="(item, index) in list" :key="index" @click="handleTap(item, index)">
 					<image class="swiper-image" :src="item.image || item" mode="aspectFill" />

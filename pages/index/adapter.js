@@ -99,7 +99,6 @@ export const adaptProductList = (apiData = {}) => {
 			stock: item.all_take_out,
 			title: item.title,
 			salesNum: item.three_take_out,
-			salesText: `Đã bán 3 trong 3 giờ gần đây`,
 			currency: 'RM',
 			price: item.price
 		}
