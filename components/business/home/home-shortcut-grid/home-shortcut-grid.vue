@@ -126,7 +126,8 @@ const handleTap = (item, index) => {
 		font-size: 24rpx;
 		color: #111111;
 		text-align: center;
-		line-height: 1.1;
+		line-height: 30rpx;
+		height: 56rpx;
 		word-break: break-word;
 		white-space: pre-wrap;
 		letter-spacing: -1rpx;
