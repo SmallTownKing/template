@@ -25,7 +25,7 @@
 				@change="handleTabChange" />
 			<view class="product-grid">
 				<view v-for="(item, index) in productList" :key="item.id || index" class="product-grid__item">
-					<home-product-card :item="item" @click="handleProductClick" />
+					<home-product-card :item="item" @click="handleProductClick(item)" />
 				</view>
 			</view>
 			<base-load-status v-if="productList.every(item => item.id)" status="finished" />
@@ -118,7 +118,7 @@ const handleProductClick = (item) => {
 			source: 'home-auth-button'
 		})
 	}
-	uni.navigateTo({ url: '/pages/lottery/index' })
+	uni.navigateTo({ url: '/pages/lottery/index?id=' + item.id })
 }
 
 const handleTabReady = ({ index, item }) => {
