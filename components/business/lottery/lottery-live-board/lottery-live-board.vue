@@ -1,5 +1,5 @@
 <template>
-	<view class="lottery-live-board"></view>
+	<view class="lottery-live-board">123123</view>
 </template>
 
 <script setup>

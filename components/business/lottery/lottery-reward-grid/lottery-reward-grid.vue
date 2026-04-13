@@ -1,5 +1,5 @@
 <template>
-	<view class="lottery-reward-grid"></view>
+	<view class="lottery-reward-grid">234</view>
 </template>
 
 <script setup>

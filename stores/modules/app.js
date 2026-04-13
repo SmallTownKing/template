@@ -1,6 +1,11 @@
 import { computed, ref } from 'vue'
 import { defineStore } from 'pinia'
 
+const createInitialUserAccount = () => ({
+	balance: '',
+	integralBalance: ''
+})
+
 const getTokenFromUserInfo = (userInfo) => {
 	if (!userInfo || typeof userInfo !== 'object') {
 		return ''
@@ -9,8 +14,8 @@ const getTokenFromUserInfo = (userInfo) => {
 	return userInfo.token || ''
 }
 
-const resolveAuthToken = (userInfo, profile, token) => {
-	return getTokenFromUserInfo(userInfo) || getTokenFromUserInfo(profile) || token || ''
+const resolveAuthToken = (userInfo, token) => {
+	return getTokenFromUserInfo(userInfo)  || token || ''
 }
 
 export const useAppStore = defineStore(
@@ -19,10 +24,10 @@ export const useAppStore = defineStore(
 		const locale = ref('')
 		const token = ref('')
 		const userInfo = ref(null)
-		const profile = ref(null)
+		const userAccount = ref(createInitialUserAccount())
 
 		const authToken = computed(() => {
-			return resolveAuthToken(userInfo.value, profile.value, token.value)
+			return resolveAuthToken(userInfo.value,  token.value)
 		})
 
 		const isLogin = computed(() => {
@@ -36,17 +41,26 @@ export const useAppStore = defineStore(
 					token: nextToken
 				}
 			}
-
-			if (profile.value && typeof profile.value === 'object') {
-				profile.value = {
-					...profile.value,
-					token: nextToken
-				}
-			}
 		}
 
 		const setLocale = (value) => {
 			locale.value = value || ''
+		}
+
+		const setUserAccount = (value) => {
+			userAccount.value = {
+				...createInitialUserAccount(),
+				...(value || {})
+			}
+		}
+
+		const patchUserAccount = (value) => {
+			const nextValue = value && typeof value === 'object' ? value : {}
+			userAccount.value = {
+				...createInitialUserAccount(),
+				...(userAccount.value || {}),
+				...nextValue
+			}
 		}
 
 		const setToken = (value) => {
@@ -60,7 +74,20 @@ export const useAppStore = defineStore(
 			const nextToken = getTokenFromUserInfo(nextUserInfo)
 
 			userInfo.value = nextUserInfo
-			profile.value = nextUserInfo
+
+			if (nextToken) {
+				token.value = nextToken
+			}
+		}
+
+		const patchUserInfo = (value) => {
+			const nextValue = value && typeof value === 'object' ? value : {}
+			const nextToken = getTokenFromUserInfo(nextValue)
+
+			userInfo.value = {
+				...(userInfo.value || {}),
+				...nextValue
+			}
 
 			if (nextToken) {
 				token.value = nextToken
@@ -71,7 +98,6 @@ export const useAppStore = defineStore(
 			const nextProfile = value || null
 			const nextToken = getTokenFromUserInfo(nextProfile)
 
-			profile.value = nextProfile
 			userInfo.value = nextProfile
 
 			if (nextToken) {
@@ -79,30 +105,102 @@ export const useAppStore = defineStore(
 			}
 		}
 
+		const patchProfile = (value) => {
+			const nextValue = value && typeof value === 'object' ? value : {}
+			const nextToken = getTokenFromUserInfo(nextValue)
+
+			userInfo.value = {
+				...(userInfo.value || {}),
+				...nextValue
+			}
+
+			if (nextToken) {
+				token.value = nextToken
+			}
+		}
+
+		const setUserSnapshot = (payload = {}) => {
+			if (Object.prototype.hasOwnProperty.call(payload, 'token')) {
+				setToken(payload.token)
+			}
+
+			if (Object.prototype.hasOwnProperty.call(payload, 'userInfo')) {
+				setUserInfo(payload.userInfo)
+			}
+
+			if (Object.prototype.hasOwnProperty.call(payload, 'userAccount')) {
+				setUserAccount(payload.userAccount)
+			}
+		}
+
+		const patchUserSnapshot = (payload = {}) => {
+			if (Object.prototype.hasOwnProperty.call(payload, 'token')) {
+				setToken(payload.token)
+			}
+
+			if (payload.userInfo && typeof payload.userInfo === 'object') {
+				patchUserInfo(payload.userInfo)
+			}
+
+			if (payload.userAccount && typeof payload.userAccount === 'object') {
+				patchUserAccount(payload.userAccount)
+			}
+		}
+
 		const logout = () => {
 			token.value = ''
 			userInfo.value = null
-			profile.value = null
+			userAccount.value = createInitialUserAccount()
 		}
 
 		return {
+			userAccount,
 			locale,
 			token,
 			userInfo,
-			profile,
 			authToken,
 			isLogin,
+			setUserAccount,
+			patchUserAccount,
 			setLocale,
 			setToken,
 			setUserInfo,
+			patchUserInfo,
 			setProfile,
+			patchProfile,
+			setUserSnapshot,
+			patchUserSnapshot,
 			logout
 		}
 	},
 	{
 		persist: {
 			key: 'store:app',
-			paths: ['locale', 'token', 'userInfo', 'profile']
+			split: true,
+			paths: [
+				{
+					path: 'locale',
+					key: 'locale',
+					legacyKeys: ['store:app:locale'],
+					raw: true
+				},
+				{
+					path: 'token',
+					key: 'token',
+					legacyKeys: ['store:app:token'],
+					raw: true
+				},
+				{
+					path: 'userInfo',
+					key: 'userInfo',
+					legacyKeys: ['store:app:userInfo']
+				},
+				{
+					path: 'userAccount',
+					key: 'userAccount',
+					legacyKeys: ['store:app:userAccount']
+				}
+			]
 		}
 	}
 )

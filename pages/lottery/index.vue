@@ -1,6 +1,10 @@
 <template>
     <view class="lottery-page">
         <base-navbar title="抽奖" background="#f5f4f9" />
+        <view style="margin: 0 32rpx; display: flex; justify-content: space-between;">
+            <lottery-live-board />
+            <lottery-reward-grid />
+        </view>
         <lottery-pool-panel :loading="loading" />
         <view style="position: fixed; bottom: 0; left: 0;">
             <lottery-action-bar />

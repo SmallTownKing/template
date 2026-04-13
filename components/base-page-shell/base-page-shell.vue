@@ -15,6 +15,7 @@
 import { computed, ref } from 'vue'
 import { passwordLogin } from '@/apis/user'
 import { useAppStore, useAuthPopupStore } from '@/stores'
+import { refreshCurrentUser } from '@/services/current-user'
 
 defineOptions({
 	name: 'BasePageShell'
@@ -54,6 +55,7 @@ const handleLoginSubmit = async (payload) => {
 				skipAuthPopup: true
 			}
 		)
+
 		const token = response?.data?.token || ''
 		const userInfo = response?.data?.userInfo || {}
 
@@ -69,6 +71,13 @@ const handleLoginSubmit = async (payload) => {
 			...userInfo,
 			token
 		})
+
+		try {
+			await refreshCurrentUser({
+				force: true
+			})
+		} catch (refreshError) {}
+
 		authPopupStore.close()
 		phone.value = ''
 		uni.showToast({
