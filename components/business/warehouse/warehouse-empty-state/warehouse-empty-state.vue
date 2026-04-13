@@ -24,12 +24,14 @@ defineProps({
 
 <style lang="scss" scoped>
 .warehouse-empty-state {
+	flex: 1;
+	width: 100%;
 	display: flex;
 	flex-direction: column;
 	align-items: center;
 	justify-content: center;
-	min-height: 760rpx;
-	padding: 60rpx 32rpx 120rpx;
+	min-height: 0;
+	padding: 60rpx 32rpx;
 	box-sizing: border-box;
 }
 

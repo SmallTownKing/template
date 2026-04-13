@@ -12,13 +12,14 @@
 					@tap="handleLeftClick">
 					<slot name="left">
 						<view v-if="hasDefaultLeft" class="base-navbar__action">
-							<view v-if="showBackArrow" class="base-navbar__back-icon" :style="backIconStyle" />
-							<text v-else-if="leftIcon" class="base-navbar__icon-text" :style="leftIconStyleObject">
+							<image v-if="showBackArrow" src="/static/icons/back.png"
+								style="width: 40rpx; height: 40rpx;" mode="scaleToFill" />
+							<!-- <text v-else-if="leftIcon" class="base-navbar__icon-text" :style="leftIconStyleObject">
 								{{ leftIcon }}
 							</text>
 							<text v-if="leftLabel" class="base-navbar__action-text" :style="leftTextStyleObject">
 								{{ leftLabel }}
-							</text>
+							</text> -->
 						</view>
 					</slot>
 				</view>

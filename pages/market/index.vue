@@ -1,6 +1,7 @@
 <template>
 	<base-page-shell>
 		<view class="market-page">
+			<view style="height: var(--status-bar-height);"></view>
 			<view style="height: 224rpx;">
 				<market-stataus-bar />
 				<market-status-tabs v-model="currentTab" />

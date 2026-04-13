@@ -114,10 +114,11 @@ const handleAuthTap = () => {
 
 const handleProductClick = (item) => {
 	if (!appStore.isLogin) {
-		authPopupStore.open({
+		return authPopupStore.open({
 			source: 'home-auth-button'
 		})
 	}
+	uni.navigateTo({ url: '/pages/lottery/index' })
 }
 
 const handleTabReady = ({ index, item }) => {

@@ -1,7 +1,7 @@
 <template>
 	<view class="user-membership-panel">
 		<image
-		 style="position: absolute; right: -36rpx; top: -130rpx; width: 300rpx; height: 300rpx;"
+		 style="position: absolute; right: -32rpx; top: -130rpx; width: 300rpx; height: 300rpx;"
 			src="/static/background/v1bg.png"
 			mode="scaleToFill"
 		/>

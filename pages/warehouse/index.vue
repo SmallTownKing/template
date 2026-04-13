@@ -1,12 +1,16 @@
 <template>
 	<base-page-shell>
 		<view class="warehouse-page">
+			<view class="warehouse-page__status-bar"></view>
 			<view class="warehouse-page__header">
 				<warehouse-top-bar :title="pageState.title" />
 				<warehouse-notice-bar :text="pageState.notice" />
 			</view>
 
-			<warehouse-content-panel class="warehouse-page__panel" @load-more="handleLoadMore">
+			<warehouse-content-panel class="warehouse-page__panel"
+				:class="{ 'warehouse-page__panel--fill': hasCurrentGoods }" :fill-body="!hasCurrentGoods"
+				:fill-available="hasCurrentGoods" :scrollable="hasCurrentGoods"
+				@load-more="handleLoadMore">
 				<template #header>
 					<warehouse-category-tabs v-model="currentTab" :tabs="displayTabs"
 						:vault-label="pageState.vault.label" :vault-count="pageState.vault.count"
@@ -22,9 +26,9 @@
 					:status="loadStatus" />
 			</warehouse-content-panel>
 
-			<warehouse-action-bar :checked="isCurrentTabFullySelected" :has-goods="hasCurrentGoods"
+			<!-- <warehouse-action-bar :checked="isCurrentTabFullySelected" :has-goods="hasCurrentGoods"
 				:total-price="totalPriceText" @toggle-all="handleToggleAll" @analyze="handleAnalyze" @pack="handlePack"
-				@send="handleSend" @sell="handleSell" />
+				@send="handleSend" @sell="handleSell" /> -->
 		</view>
 	</base-page-shell>
 </template>
@@ -260,11 +264,17 @@ const handleSell = () => {
 
 <style lang="scss" scoped>
 .warehouse-page {
-	height: calc(100vh - var(--window-bottom) - var(--status-bar-height));
-	background: #111;
+	height: calc(100vh - var(--status-bar-height));
+	background: #f6f6fa;
 	display: flex;
 	flex-direction: column;
 	overflow: hidden;
+}
+
+.warehouse-page__status-bar {
+	height: var(--status-bar-height);
+	background: #111111;
+	flex-shrink: 0;
 }
 
 .warehouse-page__header {
@@ -274,6 +284,10 @@ const handleSell = () => {
 }
 
 .warehouse-page__panel {
+	flex-shrink: 0;
+}
+
+.warehouse-page__panel--fill {
 	flex: 1;
 	min-height: 0;
 }

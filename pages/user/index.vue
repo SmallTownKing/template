@@ -12,6 +12,9 @@
 	</base-page-shell>
 </template>
 
+<script setup>
+</script>
+
 <style lang="scss" scoped>
 .user-page {
 	min-height: calc(100vh - var(--status-bar-height) - var(--window-bottom));

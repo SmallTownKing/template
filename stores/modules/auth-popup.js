@@ -1,26 +1,32 @@
+import { ref } from 'vue'
 import { defineStore } from 'pinia'
 
-const createInitialState = () => ({
-	visible: false,
-	reason: '',
-	source: '',
-	payload: null
-})
+export const useAuthPopupStore = defineStore('auth-popup', () => {
+	const visible = ref(false)
+	const reason = ref('')
+	const source = ref('')
+	const payload = ref(null)
 
-export const useAuthPopupStore = defineStore('auth-popup', {
-	state: () => createInitialState(),
-	actions: {
-		open(options = {}) {
-			this.visible = true
-			this.reason = options.reason || ''
-			this.source = options.source || ''
-			this.payload = options.payload || null
-		},
-		close() {
-			this.visible = false
-			this.reason = ''
-			this.source = ''
-			this.payload = null
-		}
+	const open = (options = {}) => {
+		visible.value = true
+		reason.value = options.reason || ''
+		source.value = options.source || ''
+		payload.value = options.payload || null
+	}
+
+	const close = () => {
+		visible.value = false
+		reason.value = ''
+		source.value = ''
+		payload.value = null
+	}
+
+	return {
+		visible,
+		reason,
+		source,
+		payload,
+		open,
+		close
 	}
 })

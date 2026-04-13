@@ -1,3 +1,4 @@
+import { computed, ref } from 'vue'
 import { defineStore } from 'pinia'
 
 const getTokenFromUserInfo = (userInfo) => {
@@ -8,73 +9,100 @@ const getTokenFromUserInfo = (userInfo) => {
 	return userInfo.token || ''
 }
 
-const resolveAuthToken = (state) => {
-	return getTokenFromUserInfo(state.userInfo) || getTokenFromUserInfo(state.profile) || state.token || ''
+const resolveAuthToken = (userInfo, profile, token) => {
+	return getTokenFromUserInfo(userInfo) || getTokenFromUserInfo(profile) || token || ''
 }
 
-export const useAppStore = defineStore('app', {
-	state: () => ({
-		locale: '',
-		token: '',
-		userInfo: null,
-		profile: null
-	}),
-	getters: {
-		authToken: (state) => resolveAuthToken(state),
-		isLogin: (state) => Boolean(resolveAuthToken(state))
-	},
-	actions: {
-		setLocale(locale) {
-			this.locale = locale || ''
-		},
-		setToken(token) {
-			const nextToken = token || ''
-			this.token = nextToken
+export const useAppStore = defineStore(
+	'app',
+	() => {
+		const locale = ref('')
+		const token = ref('')
+		const userInfo = ref(null)
+		const profile = ref(null)
 
-			if (this.userInfo && typeof this.userInfo === 'object') {
-				this.userInfo = {
-					...this.userInfo,
+		const authToken = computed(() => {
+			return resolveAuthToken(userInfo.value, profile.value, token.value)
+		})
+
+		const isLogin = computed(() => {
+			return Boolean(authToken.value)
+		})
+
+		const syncTokenToProfile = (nextToken) => {
+			if (userInfo.value && typeof userInfo.value === 'object') {
+				userInfo.value = {
+					...userInfo.value,
 					token: nextToken
 				}
 			}
 
-			if (this.profile && typeof this.profile === 'object') {
-				this.profile = {
-					...this.profile,
+			if (profile.value && typeof profile.value === 'object') {
+				profile.value = {
+					...profile.value,
 					token: nextToken
 				}
 			}
-		},
-		setUserInfo(userInfo) {
-			const nextUserInfo = userInfo || null
+		}
+
+		const setLocale = (value) => {
+			locale.value = value || ''
+		}
+
+		const setToken = (value) => {
+			const nextToken = value || ''
+			token.value = nextToken
+			syncTokenToProfile(nextToken)
+		}
+
+		const setUserInfo = (value) => {
+			const nextUserInfo = value || null
 			const nextToken = getTokenFromUserInfo(nextUserInfo)
 
-			this.userInfo = nextUserInfo
-			this.profile = nextUserInfo
+			userInfo.value = nextUserInfo
+			profile.value = nextUserInfo
 
 			if (nextToken) {
-				this.token = nextToken
+				token.value = nextToken
 			}
-		},
-		setProfile(profile) {
-			const nextProfile = profile || null
+		}
+
+		const setProfile = (value) => {
+			const nextProfile = value || null
 			const nextToken = getTokenFromUserInfo(nextProfile)
 
-			this.profile = nextProfile
-			this.userInfo = nextProfile
+			profile.value = nextProfile
+			userInfo.value = nextProfile
 
 			if (nextToken) {
-				this.token = nextToken
+				token.value = nextToken
 			}
-		},
-		logout() {
-			this.token = ''
-			this.userInfo = null
-			this.profile = null
+		}
+
+		const logout = () => {
+			token.value = ''
+			userInfo.value = null
+			profile.value = null
+		}
+
+		return {
+			locale,
+			token,
+			userInfo,
+			profile,
+			authToken,
+			isLogin,
+			setLocale,
+			setToken,
+			setUserInfo,
+			setProfile,
+			logout
 		}
 	},
-	persist: {
-		key: 'store:app',
-		paths: ['locale', 'token', 'userInfo', 'profile']
+	{
+		persist: {
+			key: 'store:app',
+			paths: ['locale', 'token', 'userInfo', 'profile']
+		}
 	}
-})
+)

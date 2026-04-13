@@ -1,3 +1,17 @@
+const ENV = {
+	MODE: import.meta.env.MODE,
+	DEV: import.meta.env.DEV,
+	VITE_APP_ENV: import.meta.env.VITE_APP_ENV,
+	VITE_API_BASE_TEST: import.meta.env.VITE_API_BASE_TEST,
+	VITE_API_BASE_PROD: import.meta.env.VITE_API_BASE_PROD,
+	VITE_COMPANY_CODE_TEST: import.meta.env.VITE_COMPANY_CODE_TEST,
+	VITE_COMPANY_CODE_PROD: import.meta.env.VITE_COMPANY_CODE_PROD,
+	VITE_REQUEST_TIMEOUT: import.meta.env.VITE_REQUEST_TIMEOUT,
+	VITE_H5_PROXY_ENABLED: import.meta.env.VITE_H5_PROXY_ENABLED,
+	VITE_H5_PROXY_PREFIX: import.meta.env.VITE_H5_PROXY_PREFIX,
+	VITE_H5_PROXY_TARGET: import.meta.env.VITE_H5_PROXY_TARGET
+}
+
 const normalizeAppEnv = (value) => {
 	const normalized = String(value || '').trim().toLowerCase()
 
@@ -9,13 +23,8 @@ const normalizeAppEnv = (value) => {
 }
 
 const getEnvValue = (key, fallback = '') => {
-	try {
-		if (typeof import.meta !== 'undefined' && import.meta.env && key in import.meta.env) {
-			return import.meta.env[key]
-		}
-	} catch (error) {}
-
-	return fallback
+	const value = ENV[key]
+	return value === undefined || value === null || value === '' ? fallback : value
 }
 
 const getBooleanEnvValue = (key, fallback = false) => {
@@ -62,6 +71,15 @@ export const COMPANY_CODE = COMPANY_CODE_MAP[APP_ENV] || ''
 export const DEFAULT_REQUEST_HEADERS = {
 	'Content-Type': 'application/json',
 	...(COMPANY_CODE ? { [COMPANY_CODE_HEADER_KEY]: COMPANY_CODE } : {})
+}
+
+if (IS_DEV) {
+	console.info('[network]', {
+		mode,
+		appEnv: APP_ENV,
+		baseApi: BASE_API,
+		useH5Proxy: USE_H5_DEV_PROXY
+	})
 }
 
 export const withBaseApi = (url = '') => {

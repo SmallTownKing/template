@@ -84,9 +84,9 @@ const emit = defineEmits(['toggle-all', 'analyze', 'pack', 'send', 'sell'])
 <style lang="scss" scoped>
 .warehouse-action-bar {
 	background: #FFF;
-	height: 180rpx;
-	padding: 24rpx 24rpx 28rpx 24rpx;
+	padding: 20rpx 24rpx calc(12rpx + env(safe-area-inset-bottom)) 24rpx;
 	box-sizing: border-box;
+	flex-shrink: 0;
 }
 
 .warehouse-action-bar__summary {
@@ -95,7 +95,7 @@ const emit = defineEmits(['toggle-all', 'analyze', 'pack', 'send', 'sell'])
 	flex-shrink: 0;
 	justify-content: space-between;
 	height: 48rpx;
-	margin-bottom: 14rpx;
+	margin-bottom: 12rpx;
 }
 
 .warehouse-action-bar__checkbox {
