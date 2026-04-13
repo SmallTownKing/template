@@ -1,9 +1,18 @@
 <template>
     <view class="lottery-page">
         <base-navbar title="抽奖" background="#f5f4f9" />
-        <view style="margin: 0 32rpx; display: flex; justify-content: space-between;">
-            <lottery-live-board />
-            <lottery-reward-grid />
+        <view style="margin: 28rpx 32rpx 45rpx 32rpx; display: flex; align-items: center; justify-content: space-between;">
+            <view>
+                <view style="width: 360rpx; height: 260rpx; overflow: hidden;">
+                    <lottery-reward-grid :list="[1, 2, 3, 4, 5, 6]" />
+                </view>
+                <view style="margin-top: 29rpx;">
+                    <lottery-online-bar />
+                </view>
+            </view>
+            <view>
+                <lottery-live-board />
+            </view>
         </view>
         <lottery-pool-panel :loading="loading" />
         <view style="position: fixed; bottom: 0; left: 0;">

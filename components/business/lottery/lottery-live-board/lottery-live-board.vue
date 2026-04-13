@@ -1,5 +1,11 @@
 <template>
-	<view class="lottery-live-board">123123</view>
+	<view class="lottery-live-board">
+		<image
+			src="/static/icons/hot-drop.png"
+			mode="scaleToFill"
+			style="width: 280rpx; height: 346rpx;"
+		/>
+	</view>
 </template>
 
 <script setup>
