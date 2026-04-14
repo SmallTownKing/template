@@ -21,12 +21,7 @@
         </view>
         <view
             style="display: grid; margin: 40rpx 18rpx 0 18rpx; row-gap: 24rpx; grid-template-columns: repeat(3, minmax(0, 1fr)); column-gap: 12rpx; ">
-            <lottery-reward-card :dataInfo="itemData" />
-            <lottery-reward-card :dataInfo="itemData" />
-            <lottery-reward-card :dataInfo="itemData" />
-            <lottery-reward-card :dataInfo="itemData" />
-            <lottery-reward-card :dataInfo="itemData" />
-            <lottery-reward-card :dataInfo="itemData" />
+            <lottery-reward-card v-for="item, i  in goodsList" :key="i" :dataInfo="item" />
         </view>
     </view>
 </template>
@@ -36,16 +31,16 @@ import { onMounted, ref } from 'vue';
 import { getOneBoxDetail, getSaleBoxOpenLog } from '@/apis/bx.js'
 import { onLoad } from '@dcloudio/uni-app'
 const loading = ref(true)
-const itemData = ref({})
+const goodsList = ref([{},{},{},{},{},{}])
 const id = ref('')
 onLoad((e) => {
     id.value = e.id
 })
 const initData = () => {
 
-    Promise.all([getOneBoxDetail({ id: id.value }, getSaleBoxOpenLog({ id: id.value }))])
+    Promise.all([getOneBoxDetail({ id: id.value }), getSaleBoxOpenLog({ id: id.value })])
         .then(([detailRes, logRes]) => {
-            console.log(detailRes, logRes)
+            // goodsList.value = detailRes.data.goodsList
             loading.value = false
         })
         .catch((error) => {
