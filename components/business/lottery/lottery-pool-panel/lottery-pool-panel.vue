@@ -2,11 +2,11 @@
     <view class="lottery-pool-panel">
         
         <view class="panel-header">
-            <view v-if="!loading" class="header-title">{{ title }}</view>
+            <view v-if="!isEmpty" class="header-title">{{ title }}</view>
         </view>
         <view class="panel-content">
             <view class="scroll-container-wrap">
-                <block v-if="loading || isEmpty">
+                <block v-if="isEmpty">
                     <view class="scroll-skeleton">
                         <view class="rate-skeleton" v-for="i in 4" :key="i">
                             <view class="rate-info-sk">
@@ -35,16 +35,15 @@
                     </view>
                 </scroll-view>
             </view>
-            <view v-if="loading || isEmpty" class="action-btn-skeleton skeleton-anim"></view>
+            <view v-if="isEmpty" class="action-btn-skeleton skeleton-anim"></view>
             <view v-else class="action-btn" @click="handleActionClick">
                 <image
-				 class="btn-icon"
-					src="/static/background/lotteryRecords.png"
-					mode="scaleToFill"
-				/>
+                 class="btn-icon"
+                    src="/static/background/lotteryRecords.png"
+                    mode="scaleToFill"
+                />
                 <view class="btn-text-box">
-                    <text class="btn-text">LỊCH SỬ</text>
-                    <text class="btn-text">RÚT THẺ</text>
+                    <text class="btn-text">Ghi chép</text>
                 </view>
             </view>
         </view>
@@ -55,29 +54,22 @@
 import { computed } from 'vue'
 
 const props = defineProps({
-    // 控制是否显示骨架屏
-    loading: {
-        type: Boolean,
-        default: false
-    },
-    title: {
-        type: [String, Number],
-        default: '1231'
-    },
-    rateList: {
-        type: Array,
-        default: () => [
-            { level: 'SP', percent: '6%' },
-            { level: 'A', percent: '8%' },
-            { level: 'B', percent: '8%' },
-            { level: 'C', percent: '86%' }
-        ]
+    dataInfo: {
+        type: Object,
+        default: () => ({
+            title: '',
+            rateList: [
+            ]
+        })
     }
 })
 
 const emit = defineEmits(['action'])
 
-const isEmpty = computed(() => !props.rateList || props.rateList.length === 0)
+const title = computed(() => props.dataInfo?.title || '')
+const rateList = computed(() => props.dataInfo?.rateList || [])
+
+const isEmpty = computed(() => !rateList.value || rateList.value.length === 0)
 
 const handleActionClick = () => {
     emit('action')
@@ -131,7 +123,7 @@ const handleActionClick = () => {
 .scroll-container-wrap {
     flex: 1;
     min-width: 0;
-	height: 67rpx;
+    height: 67rpx;
 }
 
 .scroll-container {
@@ -168,7 +160,7 @@ const handleActionClick = () => {
 .divider-img {
     width: 2rpx;
     height: 28rpx;
-    margin: 0 48rpx; 
+    margin: 0 32rpx; 
 }
 
 .level {
@@ -179,7 +171,7 @@ const handleActionClick = () => {
 }
 
 .percent {
-    font-size: 21rpx;
+    font-size: 16rpx;
     color: #666666;
     margin-top: 6rpx;
 }
@@ -190,19 +182,19 @@ const handleActionClick = () => {
     align-items: center;
     border-radius: 8rpx;
     margin-left: 20rpx;
-	width: 116rpx;
-	height: 52rpx;
-	background-image: url('/static/background/lotteryRecordBg.png');
-	background-size: 100% 100%;
-	background-repeat: no-repeat;
+    width: 116rpx;
+    height: 52rpx;
+    background-image: url('/static/background/lotteryRecordBg.png');
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
 }
 
 .btn-icon {
     margin-right: 8rpx;
     color: #ffffff;
-	width: 29rpx;
-	height: 28rpx;
-	margin-left: 10rpx;
+    width: 29rpx;
+    height: 28rpx;
+    margin-left: 10rpx;
 }
 
 .btn-text-box {
@@ -282,7 +274,7 @@ const handleActionClick = () => {
 
 .action-btn-skeleton {
    width: 116rpx;
-	height: 52rpx;
+    height: 52rpx;
     border-radius: 8rpx;
     margin-left: 20rpx;
     flex-shrink: 0;

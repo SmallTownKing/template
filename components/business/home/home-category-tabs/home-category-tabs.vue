@@ -43,7 +43,7 @@
 								}"
 							/>
 							<view class="tab-item__text-wrap">
-								<text class="tab-item__text">{{ item.name }}</text>
+								<text class="tab-item__text">{{ $t(item.name) }}</text>
 								<view class="tab-item__line"></view>
 							</view>
 						</view>
@@ -56,16 +56,13 @@
 
 <script setup>
 import { computed, onMounted, ref, watch } from 'vue'
-import { useAppI18n } from '@/i18n'
-
-const { t } = useAppI18n()
 
 const defaultList = computed(() => [
-	{ id: '11', name: t('home_006'), icon: '/static/tabs/1.png', activeIcon: '/static/tabs/1-orange.png', iconWidth: 50, iconHeight: 50, marginRight: -1 },
-	{ id: '12', name: t('home_007'), icon: '/static/tabs/2.png', activeIcon: '/static/tabs/2-orange.png', iconWidth: 54, iconHeight: 54, marginRight: 4 },
-	{ id: '3', name: t('home_008'), icon: '/static/tabs/3.png', activeIcon: '/static/tabs/3-orange.png', iconWidth: 66, iconHeight: 66, marginTop: 8, marginRight: -6 },
-	{ id: '1', name: t('home_009'), icon: '/static/tabs/4.png', activeIcon: '/static/tabs/4-orange.png', iconWidth: 36, iconHeight: 36 },
-	{ id: '5', name: t('home_010'), icon: '/static/tabs/5.png', activeIcon: '/static/tabs/5-orange.png', iconWidth: 40, iconHeight: 28 }
+	{ id: '11', name: 'home_006', icon: '/static/tabs/1.png', activeIcon: '/static/tabs/1-orange.png', iconWidth: 50, iconHeight: 50, marginRight: -1 },
+	{ id: '12', name: 'home_007', icon: '/static/tabs/2.png', activeIcon: '/static/tabs/2-orange.png', iconWidth: 54, iconHeight: 54, marginRight: 4 },
+	{ id: '3', name: 'home_008', icon: '/static/tabs/3.png', activeIcon: '/static/tabs/3-orange.png', iconWidth: 66, iconHeight: 66, marginTop: 8, marginRight: -6 },
+	{ id: '1', name: 'home_009', icon: '/static/tabs/4.png', activeIcon: '/static/tabs/4-orange.png', iconWidth: 36, iconHeight: 36 },
+	{ id: '5', name: 'home_010', icon: '/static/tabs/5.png', activeIcon: '/static/tabs/5-orange.png', iconWidth: 40, iconHeight: 28 }
 ])
 
 const props = defineProps({

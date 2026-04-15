@@ -15,7 +15,7 @@
                 <lottery-live-board />
             </view>
         </view>
-        <lottery-pool-panel :loading="loading" />
+        <lottery-pool-panel :dataInfo="versionInfo"/>
         <view style="position: fixed; bottom: 0; left: 0; z-index: 99;">
             <lottery-action-bar />
         </view>
@@ -34,6 +34,7 @@ import { adaptScheduleLogInfo, adaptScheduleDetailInfo } from './adapter'
 const loading = ref(true)
 const goodsList = ref([{}, {}, {}, {}, {}, {}])
 const logList = ref([])
+const versionInfo = ref({})
 const id = ref('')
 onLoad((e) => {
     id.value = e.id
@@ -45,6 +46,7 @@ const initData = () => {
             logList.value = adaptScheduleLogInfo(logRes)
             const detailInfo = adaptScheduleDetailInfo(detailRes)
             goodsList.value = detailInfo.goodsList
+			versionInfo.value = detailInfo.versionInfo
             loading.value = false
         })
         .catch((error) => {

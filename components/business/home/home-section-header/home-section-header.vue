@@ -4,7 +4,7 @@
 			<image class="congrats__bg-img" src="/static/background/congrats-bg.png" mode="scaleToFill" />
 
 			<view class="congrats__more" @click="handleMore">
-				{{ t('home_005') }} <text class="arrow">›</text>
+				{{ $t('home_005') }} <text class="arrow">›</text>
 			</view>
 
 			<view class="congrats__swiper-area">
@@ -70,7 +70,6 @@
 import { onUnmounted, ref, watch } from 'vue'
 import { useAppI18n } from '@/i18n'
 
-const { t } = useAppI18n()
 
 const props = defineProps({
 	list: {

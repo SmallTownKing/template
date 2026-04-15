@@ -24,7 +24,16 @@ export const adaptScheduleDetailInfo = (apiData = {}) => {
 				title: item.goodsInfo.title,
 				version: item.goodsInfo.version
 			}
-		})
+		}),
+		versionInfo: {
+			rateList: detailInfo.result.map(item => {
+				return {
+					level: item.version,
+					percent: item.ratio_text
+				}
+			}),
+			title: detailInfo.totalFa
+		}
 	}
 }
 

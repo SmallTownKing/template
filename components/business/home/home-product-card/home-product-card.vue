@@ -19,12 +19,12 @@
 			</view>
 			<view class="card-info">
 				<view class="title">{{ item.title }}</view>
-				<view class="sales-row" v-if="item.salesNum">
+				<view class="sales-row">
 					<text class="sales-num">{{ item.salesNum }}</text>
-					<text class="sales-text">{{ item.salesText || 'đã bán trong 3 giờ gần đây' }}</text>
+					<text class="sales-text">{{ item.salesText}} {{$t('home_012')}}</text>
 				</view>
 				<view class="price-row">
-					<text class="currency">{{ item.currency || 'RM' }}</text>
+					<text class="currency">{{ $t('common_001') }}</text>
 					<text class="price-val">{{ item.price }}</text>
 				</view>
 			</view>
