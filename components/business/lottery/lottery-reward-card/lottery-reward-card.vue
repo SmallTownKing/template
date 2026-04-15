@@ -54,9 +54,9 @@ const showSkeleton = computed(() => props.loading || isEmpty.value)
 // 安全提取数据，防止 undefined 报错
 const itemData = computed(() => {
     return {
-        image: props.dataInfo?.image || '',
-        probability: props.dataInfo?.probability || '',
-        name: props.dataInfo?.name || '',
+        image: props.dataInfo?.pictrue || '',
+        probability: props.dataInfo?.probabilityText || '',
+        name: props.dataInfo?.title || '',
         price: props.dataInfo?.price || ''
     }
 })

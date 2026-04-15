@@ -9,18 +9,18 @@
         >
             <view class="scroll-list">
                 <view class="scroll-item" v-for="(item, i) in list" :key="'real' + i">
-                    <image class="item-avatar" src="/static/icons/gift.png" mode="scaleToFill" />
-                    <text class="item-nickname">nickname</text>
-                    <text class="item-time">2026-12-10 22:33:11</text>
+                    <image class="item-avatar" :src="item.userInfo.picture" mode="scaleToFill" />
+                    <text class="item-nickname">{{ item.userInfo.nickname }}</text>
+                    <text class="item-time">{{ item.time }}</text>
                     <text class="item-prize">123</text>
                 </view>
             </view>
 
             <view class="scroll-list" v-if="list.length >= scrollThreshold">
                 <view class="scroll-item" v-for="(item, i) in list" :key="'copy' + i">
-                    <image class="item-avatar" src="/static/icons/gift.png" mode="scaleToFill" />
-                    <text class="item-nickname">nickname</text>
-                    <text class="item-time">2026-12-10 22:33:11</text>
+                    <image class="item-avatar" :src="item.userInfo.picture" mode="scaleToFill" />
+                    <text class="item-nickname">{{ item.userInfo.nickname }}</text>
+                    <text class="item-time">{{ item.time }}</text>
                     <text class="item-prize">123</text>
                 </view>
             </view>
